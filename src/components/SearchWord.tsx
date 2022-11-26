@@ -8,14 +8,19 @@ import MLKitTranslator, {
 } from 'react-native-mlkit-translate-text/MLKitTranslator';
 import Word from '../components/Word';
 
-const InputText = (props: any) => {
+interface props {
+  to: LANG_TAGS_TYPE;
+  from: LANG_TAGS_TYPE;
+}
+
+const InputText = ({to, from}: props) => {
   const [text, onChangeText] = React.useState('');
-  const [word, translateWord] = React.useState('');
+  const [word, translateWord] = React.useState('apple');
 
   useEffect(() => {
-    MLKitTranslator.downloadModel(props.from);
-    MLKitTranslator.downloadModel(props.to);
-  }, [props]);
+    MLKitTranslator.downloadModel(from);
+    MLKitTranslator.downloadModel(to);
+  }, [from, to]);
 
   return (
     <>
@@ -33,13 +38,7 @@ const InputText = (props: any) => {
           className="justify-center absolute h-[6vh] w-[6vh] right-[3vh] rounded-lg top-[50vh] bg-slate-500"
           onPress={async () => {
             translateWord(
-              String(
-                await MLKitTranslator.translateText(
-                  text,
-                  props.from as LANG_TAGS_TYPE,
-                  props.to as LANG_TAGS_TYPE,
-                ),
-              ),
+              String(await MLKitTranslator.translateText(text, from, to)),
             );
           }}>
           <Text>{''}</Text>

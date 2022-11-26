@@ -3,11 +3,13 @@
 import React, {useEffect} from 'react';
 import {Text, View} from 'react-native';
 import {SelectList} from 'react-native-dropdown-select-list';
+import {LANG_TAGS_TYPE} from 'react-native-mlkit-translate-text/MLKitTranslator';
 import SearchWord from '../components/SearchWord';
 
 const DropDownMenu = () => {
-  const [fromSelected, setSelectedFrom] = React.useState('');
-  const [toSelected, setSelectedTo] = React.useState('');
+  const [fromSelected, setSelectedFrom] =
+    React.useState<LANG_TAGS_TYPE>('TURKISH');
+  const [toSelected, setSelectedTo] = React.useState<LANG_TAGS_TYPE>('ENGLISH');
 
   const data = [
     {key: 'TURKISH', value: 'TURKISH'},
@@ -26,7 +28,7 @@ const DropDownMenu = () => {
           }}
           dropdownItemStyles={{backgroundColor: 'white'}}
           defaultOption={data[0]}
-          setSelected={(val: any) => setSelectedFrom(val)}
+          setSelected={(val: LANG_TAGS_TYPE) => setSelectedFrom(val)}
           data={data}
           save="value"
         />
@@ -40,7 +42,7 @@ const DropDownMenu = () => {
           }}
           dropdownItemStyles={{backgroundColor: 'white'}}
           defaultOption={data[1]}
-          setSelected={(val: any) => setSelectedTo(val)}
+          setSelected={(val: LANG_TAGS_TYPE) => setSelectedTo(val)}
           data={data}
           save="value"
         />
