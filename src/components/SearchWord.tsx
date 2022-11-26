@@ -26,11 +26,11 @@ const InputText = ({to, from}: props) => {
     <>
       <Word word={word} />
       <TextInput
-        className="shadow-lg shadow-gray-900 bg-white h-[6vh] w-[34vh] left-[3vh]  absolute top-[50vh] rounded-lg"
+        className="shadow-lg shadow-gray-900 bg-white h-[6vh] w-[34vh] left-[3vh]  absolute top-[50vh] rounded-lg pl-[1vh]"
         placeholder={'Search'}
         onChangeText={onChangeText}
         inlineImageLeft={'search_icon'}
-        inlineImagePadding={10}
+        inlineImagePadding={30}
         value={text}
       />
       <>

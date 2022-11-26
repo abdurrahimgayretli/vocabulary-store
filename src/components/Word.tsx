@@ -8,7 +8,7 @@ const Word = ({word}: {word: string}) => {
     <>
       <View className="top-[5vh] bg-white w-[36vh] h-[5vh] self-center justify-center rounded-lg border-2 border-gray-300 absolute shadow-lg shadow-gray-900">
         <Text className="text-black font-bold self-center text-base ">
-          {word === '' ? (word = 'apple') : word}
+          {word === '' ? (word = 'Apple') : word.toUpperCase()}
         </Text>
       </View>
       <ExampleArea word={word} />
