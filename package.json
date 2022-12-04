@@ -25,6 +25,7 @@
     "react-native-mlkit-translate-text": "^1.0.2",
     "react-native-paper": "^5.0.0-rc.10",
     "react-native-select-dropdown": "^3.0.3",
+    "react-native-tts": "^4.1.0",
     "react-native-vector-icons": "^9.2.0"
   },
   "devDependencies": {

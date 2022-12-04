@@ -10,15 +10,21 @@ const DropDownMenu = () => {
   const [fromSelected, setSelectedFrom] =
     React.useState<LANG_TAGS_TYPE>('TURKISH');
   const [toSelected, setSelectedTo] = React.useState<LANG_TAGS_TYPE>('ENGLISH');
+  const [speechLang, setSpeechLang] = React.useState('');
 
   const data = [
-    {key: 'TURKISH', value: 'TURKISH'},
-    {key: 'ENGLISH', value: 'ENGLISH'},
+    {key: 'TURKISH', value: 'TURKISH', speechLang: 'tr-TR'},
+    {key: 'ENGLISH', value: 'ENGLISH', speechLang: 'en-GB'},
+    {key: 'RUSSIAN', value: 'RUSSIAN', speechLang: 'ru-RU'},
   ];
+
+  useEffect(() => {
+    console.log(fromSelected + ' ' + toSelected + ' ' + speechLang);
+  }, [fromSelected, speechLang, toSelected]);
 
   return (
     <>
-      <SearchWord to={toSelected} from={fromSelected} />
+      <SearchWord to={toSelected} from={fromSelected} speechLang={speechLang} />
       <View className="absolute h-[7vh] top-[40vh] w-[16vh] left-[2vh] ">
         <SelectList
           boxStyles={{
@@ -42,7 +48,12 @@ const DropDownMenu = () => {
           }}
           dropdownItemStyles={{backgroundColor: 'white'}}
           defaultOption={data[1]}
-          setSelected={(val: LANG_TAGS_TYPE) => setSelectedTo(val)}
+          setSelected={(val: LANG_TAGS_TYPE) => {
+            setSelectedTo(val);
+            data.forEach((to, i) => {
+              String(val) === to.value ? setSpeechLang(to.speechLang) : '';
+            });
+          }}
           data={data}
           save="value"
         />

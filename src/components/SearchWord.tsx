@@ -9,9 +9,10 @@ import Word from '../components/Word';
 interface props {
   to: LANG_TAGS_TYPE;
   from: LANG_TAGS_TYPE;
+  speechLang: string;
 }
 
-const InputText = ({to, from}: props) => {
+const InputText = ({to, from, speechLang}: props) => {
   const [text, onChangeText] = React.useState('');
   const [word, translateWord] = React.useState('Apple');
 
@@ -22,7 +23,7 @@ const InputText = ({to, from}: props) => {
 
   return (
     <>
-      <Word word={word} />
+      <Word word={word} speechLang={speechLang} />
       <TextInput
         className="shadow-lg shadow-gray-900 bg-white h-[6vh] w-[34vh] left-[3vh]  absolute top-[50vh] rounded-lg pl-[1vh]"
         placeholder={'Search'}
