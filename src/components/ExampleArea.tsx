@@ -35,7 +35,7 @@ const ExampleArea = ({word}: {word: string}) => {
               <>
                 <Text>{wordArray[0]}</Text>
                 <Text className="font-bold">{word.toLowerCase()}</Text>
-                <Text> {wordArray[1]}</Text>
+                <Text>{wordArray[1]}</Text>
               </>
             )}
           </>

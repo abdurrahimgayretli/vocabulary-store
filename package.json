@@ -10,17 +10,22 @@
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
   },
   "dependencies": {
+    "@react-native-voice/voice": "^3.2.4",
     "@tanstack/react-query": "^4.16.1",
     "axios": "^1.2.0",
     "fetch": "^1.1.0",
+    "google-search-results-nodejs": "^2.1.0",
     "nativewind": "^2.0.11",
     "node": "^19.1.0",
     "puppeteer": "^19.3.0",
     "react": "18.1.0",
     "react-native": "0.70.6",
+    "react-native-dotenv": "^3.4.2",
     "react-native-dropdown-select-list": "^2.0.2",
     "react-native-mlkit-translate-text": "^1.0.2",
-    "react-native-select-dropdown": "^3.0.3"
+    "react-native-paper": "^5.0.0-rc.10",
+    "react-native-select-dropdown": "^3.0.3",
+    "react-native-vector-icons": "^9.2.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",
@@ -28,6 +33,7 @@
     "@react-native-community/eslint-config": "^2.0.0",
     "@tsconfig/react-native": "^2.0.2",
     "@types/jest": "^26.0.23",
+    "@types/node": "^18.11.10",
     "@types/react": "^18.0.21",
     "@types/react-native": "^0.70.6",
     "@types/react-test-renderer": "^18.0.0",

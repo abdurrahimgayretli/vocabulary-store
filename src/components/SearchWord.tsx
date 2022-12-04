@@ -1,11 +1,9 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable react-native/no-inline-styles */
 import React, {useEffect} from 'react';
-import {Text, TextInput, TouchableOpacity} from 'react-native';
+import {View, TextInput} from 'react-native';
 import MLKitTranslator, {
   LANG_TAGS_TYPE,
-  LANG_TAGS,
 } from 'react-native-mlkit-translate-text/MLKitTranslator';
+import {IconButton} from 'react-native-paper';
 import Word from '../components/Word';
 
 interface props {
@@ -15,7 +13,7 @@ interface props {
 
 const InputText = ({to, from}: props) => {
   const [text, onChangeText] = React.useState('');
-  const [word, translateWord] = React.useState('apple');
+  const [word, translateWord] = React.useState('Apple');
 
   useEffect(() => {
     MLKitTranslator.downloadModel(from);
@@ -33,17 +31,18 @@ const InputText = ({to, from}: props) => {
         inlineImagePadding={30}
         value={text}
       />
-      <>
-        <TouchableOpacity
-          className="justify-center absolute h-[6vh] w-[6vh] right-[3vh] rounded-lg top-[50vh] bg-slate-500"
+      <View className="justify-center rounded-lg absolute bg-white h-[6vh] w-[6vh] right-[3vh] top-[50vh] ">
+        <IconButton
+          style={{alignSelf: 'center'}}
+          iconColor="black"
           onPress={async () => {
             translateWord(
               String(await MLKitTranslator.translateText(text, from, to)),
             );
-          }}>
-          <Text>{''}</Text>
-        </TouchableOpacity>
-      </>
+          }}
+          icon={require('../../assets/enter.png')}
+        />
+      </View>
     </>
   );
 };
