@@ -22,7 +22,7 @@ const Word = ({
   enWord: string;
 }) => {
   const [started, setStarted] = useState(false);
-  const [results, setResults] = useState([]);
+  const [results, setResults] = useState(['']);
   const [pronunciation, setPronunciation] = useState(false);
 
   useEffect(() => {
@@ -31,7 +31,6 @@ const Word = ({
     Voice.onSpeechEnd = onSpeechEnd;
 
     changeResults();
-    console.log(results);
 
     return () => {
       Voice.destroy().then(Voice.removeAllListeners);
@@ -41,9 +40,8 @@ const Word = ({
   useEffect(() => {
     setPronunciation(false);
     Tts.setDefaultLanguage(String(speechLang));
-    setResults([]);
-    console.log(enWord + ' ' + word);
-  }, [enWord]);
+    setResults(['']);
+  }, [enWord, word]);
 
   const startSpeechToText = async () => {
     await Voice.start(String(speechLang));
@@ -85,7 +83,7 @@ const Word = ({
             Tts.speak(word);
           }}
           className={`${
-            results[0] !== undefined
+            results[0] !== ''
               ? pronunciation
                 ? 'text-green-400'
                 : 'text-red-600'
@@ -102,7 +100,7 @@ const Word = ({
         />
       </View>
       <ExampleArea word={word} enWord={enWord} to={to} from={from} />
-      {/* <WordImage word={word} country={speechLang.split('-')[0]} /> */}
+      <WordImage word={word} language={speechLang.split('-')[0]} />
     </>
   );
 };

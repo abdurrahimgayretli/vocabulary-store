@@ -25,9 +25,6 @@ const SearchWord = ({to, from, speechLang}: props) => {
       !e && MLKitTranslator.downloadModel(to);
     });
   }, [from, to]);
-  useEffect(() => {
-    console.log(word + ' ' + enWord + 'hey');
-  }, [word, enWord]);
 
   return (
     <>

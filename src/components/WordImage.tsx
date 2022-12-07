@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
 import {useQuery} from '@tanstack/react-query';
 import React, {useState} from 'react';
@@ -5,18 +6,17 @@ import {Image, View} from 'react-native';
 import {ActivityIndicator, MD2Colors} from 'react-native-paper';
 import {fetchImage} from '../api';
 
-const WordImage = ({word, country}: {word: string; country: string}) => {
+const WordImage = ({word, language}: {word: string; language: string}) => {
   const {isLoading, isError, data, refetch} = useQuery(['images'], () =>
-    fetchImage(word, country),
+    fetchImage(word, language),
   );
   const [imageURI, setImageURI] = useState('');
 
   React.useEffect(() => {
     refetch().then(() => {
       setImageURI(data);
-      console.log(data);
     });
-  }, [data, word, imageURI, refetch]);
+  }, [data, word]);
 
   return (
     <>

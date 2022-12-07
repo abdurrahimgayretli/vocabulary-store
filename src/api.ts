@@ -21,13 +21,13 @@ export const exampleSentences = async (word: string) => {
   return data.results[0].lexicalEntries[0].sentences[0].text;
 };
 
-export const fetchImage = async (word: string, country: string) => {
+export const fetchImage = async (word: string, language: string) => {
   const {data} = await axios.get(
     `https://serpapi.com/search.json?q=${word}&tbm=isch&ijn=0`,
     {
       params: {
-        api_key: 'REACT_APP_SERP_KEY',
-        gl: `${country}`,
+        api_key: REACT_APP_SERP_KEY,
+        hl: `${language}`,
       },
     },
   );

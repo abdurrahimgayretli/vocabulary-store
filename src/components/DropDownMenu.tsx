@@ -10,17 +10,13 @@ const DropDownMenu = () => {
   const [fromSelected, setSelectedFrom] =
     React.useState<LANG_TAGS_TYPE>('TURKISH');
   const [toSelected, setSelectedTo] = React.useState<LANG_TAGS_TYPE>('ENGLISH');
-  const [speechLang, setSpeechLang] = React.useState('');
+  const [speechLang, setSpeechLang] = React.useState('en-GB');
 
   const data = [
     {key: 'TURKISH', value: 'TURKISH', speechLang: 'tr-TR'},
     {key: 'ENGLISH', value: 'ENGLISH', speechLang: 'en-GB'},
     {key: 'RUSSIAN', value: 'RUSSIAN', speechLang: 'ru-RU'},
   ];
-
-  useEffect(() => {
-    console.log(fromSelected + ' ' + toSelected + ' ' + speechLang);
-  }, [fromSelected, speechLang, toSelected]);
 
   return (
     <>

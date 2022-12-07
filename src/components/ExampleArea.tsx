@@ -27,22 +27,28 @@ const ExampleArea = ({
 
   useEffect(() => {
     refetch().then(async () => {
-      setsentenceNow(data);
-      if (sentenceNow !== '') {
-        if (to === 'ENGLISH') {
-          setWordArray(
-            sentenceNow.split(word === '' ? 'apple' : word.toLocaleLowerCase()),
-          );
-        } else {
-          setTempSentence(
-            String(await MLKitTranslator.translateText(sentenceNow, from, to)),
-          );
+      if (data !== undefined) {
+        setsentenceNow(data);
+        if (sentenceNow !== '') {
+          if (to === 'ENGLISH') {
+            setWordArray(
+              sentenceNow.split(
+                word === '' ? 'apple' : word.toLocaleLowerCase(),
+              ),
+            );
+          } else {
+            setTempSentence(
+              String(
+                await MLKitTranslator.translateText(sentenceNow, from, to),
+              ),
+            );
 
-          setWordArray(tempSentence.split(word.toLocaleLowerCase()));
+            setWordArray(tempSentence.split(word.toLocaleLowerCase()));
+          }
         }
       }
     });
-  }, [word, enWord]);
+  }, [to === 'ENGLISH' ? word : enWord, data]);
 
   return (
     <View className="top-[15vh] bg-white w-[40vh] h-[20vh] self-center  rounded-lg border-2 border-gray-300 absolute shadow-lg shadow-gray-900">
