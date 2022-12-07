@@ -6,8 +6,21 @@ import WordImage from './WordImage';
 import {IconButton} from 'react-native-paper';
 import Voice from '@react-native-voice/voice';
 import Tts from 'react-native-tts';
+import {LANG_TAGS_TYPE} from 'react-native-mlkit-translate-text/MLKitTranslator';
 
-const Word = ({word, speechLang}: {word: string; speechLang: string}) => {
+const Word = ({
+  word,
+  to,
+  from,
+  speechLang,
+  enWord,
+}: {
+  word: string;
+  to: LANG_TAGS_TYPE;
+  from: LANG_TAGS_TYPE;
+  speechLang: string;
+  enWord: string;
+}) => {
   const [started, setStarted] = useState(false);
   const [results, setResults] = useState([]);
   const [pronunciation, setPronunciation] = useState(false);
@@ -18,6 +31,7 @@ const Word = ({word, speechLang}: {word: string; speechLang: string}) => {
     Voice.onSpeechEnd = onSpeechEnd;
 
     changeResults();
+    console.log(results);
 
     return () => {
       Voice.destroy().then(Voice.removeAllListeners);
@@ -27,7 +41,9 @@ const Word = ({word, speechLang}: {word: string; speechLang: string}) => {
   useEffect(() => {
     setPronunciation(false);
     Tts.setDefaultLanguage(String(speechLang));
-  }, [word]);
+    setResults([]);
+    console.log(enWord + ' ' + word);
+  }, [enWord]);
 
   const startSpeechToText = async () => {
     await Voice.start(String(speechLang));
@@ -69,7 +85,11 @@ const Word = ({word, speechLang}: {word: string; speechLang: string}) => {
             Tts.speak(word);
           }}
           className={`${
-            pronunciation ? 'text-green-400' : 'text-black'
+            results[0] !== undefined
+              ? pronunciation
+                ? 'text-green-400'
+                : 'text-red-600'
+              : 'text-black'
           } font-bold self-center text-base underline decoration-dotted decoration-cyan-300`}>
           {word === '' ? (word = 'Apple') : word.toUpperCase()}
         </Text>
@@ -77,12 +97,12 @@ const Word = ({word, speechLang}: {word: string; speechLang: string}) => {
         <IconButton
           onPress={!started ? startSpeechToText : stopSpeechToText}
           style={{position: 'absolute', right: 5, width: 30, height: 30}}
-          iconColor={started == true ? '#90EE90' : 'black'}
+          iconColor={started === true ? '#90EE90' : 'black'}
           icon={require('../../assets/microphone.png')}
         />
       </View>
-      <ExampleArea word={word} />
-      <WordImage word={word} />
+      <ExampleArea word={word} enWord={enWord} to={to} from={from} />
+      {/* <WordImage word={word} country={speechLang.split('-')[0]} /> */}
     </>
   );
 };

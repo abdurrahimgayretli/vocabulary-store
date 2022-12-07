@@ -12,18 +12,32 @@ interface props {
   speechLang: string;
 }
 
-const InputText = ({to, from, speechLang}: props) => {
+const SearchWord = ({to, from, speechLang}: props) => {
   const [text, onChangeText] = React.useState('');
   const [word, translateWord] = React.useState('Apple');
+  const [enWord, setEnWord] = React.useState('');
 
   useEffect(() => {
-    MLKitTranslator.downloadModel(from);
-    MLKitTranslator.downloadModel(to);
+    MLKitTranslator.isModelDownloaded(from).then(e => {
+      !e && MLKitTranslator.downloadModel(from);
+    });
+    MLKitTranslator.isModelDownloaded(to).then(e => {
+      !e && MLKitTranslator.downloadModel(to);
+    });
   }, [from, to]);
+  useEffect(() => {
+    console.log(word + ' ' + enWord + 'hey');
+  }, [word, enWord]);
 
   return (
     <>
-      <Word word={word} speechLang={speechLang} />
+      <Word
+        word={word}
+        enWord={enWord}
+        to={to}
+        from={from}
+        speechLang={speechLang}
+      />
       <TextInput
         className="shadow-lg shadow-gray-900 bg-white h-[6vh] w-[34vh] left-[3vh]  absolute top-[50vh] rounded-lg pl-[1vh]"
         placeholder={'Search'}
@@ -40,6 +54,13 @@ const InputText = ({to, from, speechLang}: props) => {
             translateWord(
               String(await MLKitTranslator.translateText(text, from, to)),
             );
+            to !== 'ENGLISH'
+              ? setEnWord(
+                  String(
+                    await MLKitTranslator.translateText(text, from, 'ENGLISH'),
+                  ),
+                )
+              : undefined;
           }}
           icon={require('../../assets/enter.png')}
         />
@@ -48,4 +69,4 @@ const InputText = ({to, from, speechLang}: props) => {
   );
 };
 
-export default InputText;
+export default SearchWord;

@@ -5,9 +5,9 @@ import {Image, View} from 'react-native';
 import {ActivityIndicator, MD2Colors} from 'react-native-paper';
 import {fetchImage} from '../api';
 
-const WordImage = ({word}: {word: string}) => {
+const WordImage = ({word, country}: {word: string; country: string}) => {
   const {isLoading, isError, data, refetch} = useQuery(['images'], () =>
-    fetchImage(word),
+    fetchImage(word, country),
   );
   const [imageURI, setImageURI] = useState('');
 

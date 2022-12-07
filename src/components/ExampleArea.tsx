@@ -3,22 +3,46 @@ import {View, Text} from 'react-native';
 import React, {useEffect} from 'react';
 import {exampleSentences} from '../api';
 import {useQuery} from '@tanstack/react-query';
+import MLKitTranslator, {
+  LANG_TAGS_TYPE,
+} from 'react-native-mlkit-translate-text/MLKitTranslator';
 
-const ExampleArea = ({word}: {word: string}) => {
+const ExampleArea = ({
+  enWord,
+  word,
+  to,
+  from,
+}: {
+  enWord: string;
+  word: string;
+  to: LANG_TAGS_TYPE;
+  from: LANG_TAGS_TYPE;
+}) => {
   const {isLoading, isError, data, refetch} = useQuery(['sentences'], () =>
-    exampleSentences(word),
+    exampleSentences(to === 'ENGLISH' ? word : enWord),
   );
   const [sentenceNow, setsentenceNow] = React.useState('');
   const [wordArray, setWordArray] = React.useState(['']);
+  const [tempSentence, setTempSentence] = React.useState('');
 
   useEffect(() => {
-    refetch().then(() => {
+    refetch().then(async () => {
       setsentenceNow(data);
       if (sentenceNow !== '') {
-        setWordArray(sentenceNow.split(word.toLocaleLowerCase()));
+        if (to === 'ENGLISH') {
+          setWordArray(
+            sentenceNow.split(word === '' ? 'apple' : word.toLocaleLowerCase()),
+          );
+        } else {
+          setTempSentence(
+            String(await MLKitTranslator.translateText(sentenceNow, from, to)),
+          );
+
+          setWordArray(tempSentence.split(word.toLocaleLowerCase()));
+        }
       }
     });
-  }, [data, word, sentenceNow]);
+  }, [word, enWord]);
 
   return (
     <View className="top-[15vh] bg-white w-[40vh] h-[20vh] self-center  rounded-lg border-2 border-gray-300 absolute shadow-lg shadow-gray-900">
@@ -34,7 +58,7 @@ const ExampleArea = ({word}: {word: string}) => {
             ) : (
               <>
                 <Text>{wordArray[0]}</Text>
-                <Text className="font-bold">{word.toLowerCase()}</Text>
+                <Text className="font-bold">{word}</Text>
                 <Text>{wordArray[1]}</Text>
               </>
             )}

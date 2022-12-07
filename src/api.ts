@@ -12,20 +12,22 @@ export const exampleSentences = async (word: string) => {
     `https://od-api.oxforddictionaries.com:443/api/v2/sentences/en/${word}?strictMatch=false`,
     {
       headers: {
-        app_id: 'REACT_APP_OXFORD_ID',
-        app_key: 'REACT_APP_OXFORD_KEY',
+        app_id: REACT_APP_OXFORD_ID,
+        app_key: REACT_APP_OXFORD_KEY,
+        language: 'en-gb',
       },
     },
   );
   return data.results[0].lexicalEntries[0].sentences[0].text;
 };
 
-export const fetchImage = async (word: string) => {
+export const fetchImage = async (word: string, country: string) => {
   const {data} = await axios.get(
     `https://serpapi.com/search.json?q=${word}&tbm=isch&ijn=0`,
     {
       params: {
         api_key: 'REACT_APP_SERP_KEY',
+        gl: `${country}`,
       },
     },
   );
