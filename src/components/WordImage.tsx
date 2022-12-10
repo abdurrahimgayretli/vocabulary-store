@@ -4,11 +4,11 @@ import {useQuery} from '@tanstack/react-query';
 import React, {useState} from 'react';
 import {Image, View} from 'react-native';
 import {ActivityIndicator, MD2Colors} from 'react-native-paper';
-import {fetchImage} from '../api';
+import {fetchImage2} from '../api';
 
-const WordImage = ({word, language}: {word: string; language: string}) => {
+const WordImage = ({word}: {word: string}) => {
   const {isLoading, isError, data, refetch} = useQuery(['images'], () =>
-    fetchImage(word, language),
+    fetchImage2(word),
   );
   const [imageURI, setImageURI] = useState('');
 

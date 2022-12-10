@@ -99,8 +99,8 @@ const Word = ({
           icon={require('../../assets/microphone.png')}
         />
       </View>
-      <ExampleArea word={word} enWord={enWord} to={to} from={from} />
-      <WordImage word={word} language={speechLang.split('-')[0]} />
+      {/* <ExampleArea word={word} enWord={enWord} to={to} from={from} /> */}
+      {/* <WordImage word={word} /> */}
     </>
   );
 };

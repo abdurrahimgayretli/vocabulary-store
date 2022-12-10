@@ -14,8 +14,8 @@ interface props {
 
 const SearchWord = ({to, from, speechLang}: props) => {
   const [text, onChangeText] = React.useState('');
-  const [word, translateWord] = React.useState('Apple');
-  const [enWord, setEnWord] = React.useState('');
+  const [word, translateWord] = React.useState('Book');
+  const [enWord, setEnWord] = React.useState('Book');
 
   useEffect(() => {
     MLKitTranslator.isModelDownloaded(from).then(e => {
@@ -51,13 +51,11 @@ const SearchWord = ({to, from, speechLang}: props) => {
             translateWord(
               String(await MLKitTranslator.translateText(text, from, to)),
             );
-            to !== 'ENGLISH'
-              ? setEnWord(
-                  String(
-                    await MLKitTranslator.translateText(text, from, 'ENGLISH'),
-                  ),
-                )
-              : undefined;
+            setEnWord(
+              String(
+                await MLKitTranslator.translateText(text, from, 'ENGLISH'),
+              ),
+            );
           }}
           icon={require('../../assets/enter.png')}
         />
