@@ -25,7 +25,6 @@ const ExampleArea = ({
 
   useEffect(() => {
     refetch();
-    console.log(enWord + 'girdi');
   }, [enWord]);
 
   useEffect(() => {

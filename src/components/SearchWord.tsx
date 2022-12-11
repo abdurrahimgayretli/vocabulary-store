@@ -14,7 +14,8 @@ interface props {
 
 const SearchWord = ({to, from, speechLang}: props) => {
   const [text, onChangeText] = React.useState('');
-  const [word, translateWord] = React.useState('Book');
+  const [word, setWord] = React.useState('');
+  const [transWord, setTransWord] = React.useState('Book');
   const [enWord, setEnWord] = React.useState('Book');
 
   useEffect(() => {
@@ -26,10 +27,15 @@ const SearchWord = ({to, from, speechLang}: props) => {
     });
   }, [from, to]);
 
+  useEffect(() => {
+    setWord(text);
+  }, [transWord]);
+
   return (
     <>
       <Word
         word={word}
+        transWord={transWord}
         enWord={enWord}
         to={to}
         from={from}
@@ -48,7 +54,7 @@ const SearchWord = ({to, from, speechLang}: props) => {
           style={{alignSelf: 'center'}}
           iconColor="black"
           onPress={async () => {
-            translateWord(
+            setTransWord(
               String(await MLKitTranslator.translateText(text, from, to)),
             );
             setEnWord(
