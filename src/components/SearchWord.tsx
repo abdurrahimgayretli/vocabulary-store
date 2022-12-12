@@ -9,14 +9,15 @@ import Word from '../components/Word';
 interface props {
   to: LANG_TAGS_TYPE;
   from: LANG_TAGS_TYPE;
-  speechLang: string;
+  toSpeechLang: string;
+  fromSpeechLang: string;
 }
 
-const SearchWord = ({to, from, speechLang}: props) => {
+const SearchWord = ({to, from, toSpeechLang, fromSpeechLang}: props) => {
   const [text, onChangeText] = React.useState('');
-  const [word, setWord] = React.useState('');
-  const [transWord, setTransWord] = React.useState('Book');
-  const [enWord, setEnWord] = React.useState('Book');
+  const [word, setWord] = React.useState('kitap');
+  const [transWord, setTransWord] = React.useState('book');
+  const [enWord, setEnWord] = React.useState('book');
 
   useEffect(() => {
     MLKitTranslator.isModelDownloaded(from).then(e => {
@@ -28,7 +29,7 @@ const SearchWord = ({to, from, speechLang}: props) => {
   }, [from, to]);
 
   useEffect(() => {
-    setWord(text);
+    setWord(text === '' ? 'kitap' : text);
   }, [transWord]);
 
   return (
@@ -39,17 +40,18 @@ const SearchWord = ({to, from, speechLang}: props) => {
         enWord={enWord}
         to={to}
         from={from}
-        speechLang={speechLang}
+        toSpeechLang={toSpeechLang}
+        fromSpeechLang={fromSpeechLang}
       />
       <TextInput
-        className="shadow-lg shadow-gray-900 bg-white h-[6vh] w-[34vh] left-[3vh]  absolute top-[50vh] rounded-lg pl-[1vh]"
+        className="shadow-lg shadow-gray-900 bg-white h-[6vh] w-[30vh] left-[4vh]  absolute top-[45vh] rounded-lg pl-[1vh]"
         placeholder={'Search'}
         onChangeText={onChangeText}
         inlineImageLeft={'search_icon'}
         inlineImagePadding={30}
         value={text}
       />
-      <View className="justify-center rounded-lg absolute bg-white h-[6vh] w-[6vh] right-[3vh] top-[50vh] ">
+      <View className="justify-center rounded-lg absolute bg-white h-[6vh] w-[6vh] right-[4vh] top-[45vh] ">
         <IconButton
           style={{alignSelf: 'center'}}
           iconColor="black"

@@ -10,7 +10,8 @@ const DropDownMenu = () => {
   const [fromSelected, setSelectedFrom] =
     React.useState<LANG_TAGS_TYPE>('TURKISH');
   const [toSelected, setSelectedTo] = React.useState<LANG_TAGS_TYPE>('ENGLISH');
-  const [speechLang, setSpeechLang] = React.useState('en-GB');
+  const [fromSpeechLang, setFromSpeechLang] = React.useState('tr-TR');
+  const [toSpeechLang, setToSpeechLang] = React.useState('en-GB');
 
   const data = [
     {key: 'TURKISH', value: 'TURKISH', speechLang: 'tr-TR'},
@@ -20,8 +21,13 @@ const DropDownMenu = () => {
 
   return (
     <>
-      <SearchWord to={toSelected} from={fromSelected} speechLang={speechLang} />
-      <View className="absolute h-[7vh] top-[40vh] w-[16vh] left-[2vh] ">
+      <SearchWord
+        to={toSelected}
+        from={fromSelected}
+        toSpeechLang={toSpeechLang}
+        fromSpeechLang={fromSpeechLang}
+      />
+      <View className="absolute h-[7vh] top-[35vh] w-[16vh] left-[4vh] ">
         <SelectList
           boxStyles={{
             backgroundColor: 'white',
@@ -30,12 +36,19 @@ const DropDownMenu = () => {
           }}
           dropdownItemStyles={{backgroundColor: 'white'}}
           defaultOption={data[0]}
-          setSelected={(val: LANG_TAGS_TYPE) => setSelectedFrom(val)}
+          setSelected={(val: LANG_TAGS_TYPE) => {
+            setSelectedFrom(val);
+            data.forEach(from => {
+              String(val) === from.value
+                ? setFromSpeechLang(from.speechLang)
+                : '';
+            });
+          }}
           data={data}
           save="value"
         />
       </View>
-      <View className="absolute h-[7vh] top-[40vh] w-[16vh] right-[2vh]">
+      <View className="absolute h-[7vh] top-[35vh] w-[16vh] right-[4vh]">
         <SelectList
           boxStyles={{
             backgroundColor: 'white',
@@ -47,7 +60,7 @@ const DropDownMenu = () => {
           setSelected={(val: LANG_TAGS_TYPE) => {
             setSelectedTo(val);
             data.forEach((to, i) => {
-              String(val) === to.value ? setSpeechLang(to.speechLang) : '';
+              String(val) === to.value ? setToSpeechLang(to.speechLang) : '';
             });
           }}
           data={data}

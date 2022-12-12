@@ -8,22 +8,24 @@ import {IconButton} from 'react-native-paper';
 import Voice from '@react-native-voice/voice';
 import Tts from 'react-native-tts';
 import {LANG_TAGS_TYPE} from 'react-native-mlkit-translate-text/MLKitTranslator';
-import {useQuery, useRealm, Words} from '../models/Words';
-import {Button} from 'native-base';
+import {useQuery, useRealm, Lists} from '../models/Lists';
+import {Words} from '../models/Words';
 
 const Word = ({
   word,
   transWord,
   to,
   from,
-  speechLang,
+  toSpeechLang,
+  fromSpeechLang,
   enWord,
 }: {
   word: string;
   transWord: string;
   to: LANG_TAGS_TYPE;
   from: LANG_TAGS_TYPE;
-  speechLang: string;
+  toSpeechLang: string;
+  fromSpeechLang: string;
   enWord: string;
 }) => {
   const [started, setStarted] = useState(false);
@@ -31,13 +33,28 @@ const Word = ({
   const [pronunciation, setPronunciation] = useState(false);
 
   const realm = useRealm();
+  const handleAddLists = useCallback(
+    (listName: string, words: string[]): void => {
+      if (!word) {
+        return;
+      }
+      realm.write(() => {
+        realm.create('List', Lists.generate('My List'));
+      });
+    },
+    [realm],
+  );
+  const lists = useQuery('List');
   const handleAddWord = useCallback(
     (word: string, transWord: string, from: string, to: string): void => {
       if (!word) {
         return;
       }
       realm.write(() => {
-        realm.create('Word', Words.generate(word, transWord, from, to));
+        realm.create(
+          'Word',
+          Words.generate(word, transWord, from, to, 'My List 2'),
+        );
       });
     },
     [realm],
@@ -58,7 +75,7 @@ const Word = ({
 
   useEffect(() => {
     setPronunciation(false);
-    Tts.setDefaultLanguage(String(speechLang));
+    Tts.setDefaultLanguage(String(toSpeechLang));
     setResults(['']);
   }, [enWord, word]);
 
@@ -67,7 +84,7 @@ const Word = ({
   }, [realm]);
 
   const startSpeechToText = async () => {
-    await Voice.start(String(speechLang));
+    await Voice.start(String(toSpeechLang));
     setStarted(true);
   };
   const stopSpeechToText = async () => {
@@ -90,7 +107,7 @@ const Word = ({
     String(results[0])
       .split(' ')
       .forEach(value => {
-        word.split(' ').forEach(elem => {
+        transWord.split(' ').forEach(elem => {
           elem.toLocaleLowerCase() === value.toLocaleLowerCase()
             ? setPronunciation(true)
             : setPronunciation(false);
@@ -100,7 +117,7 @@ const Word = ({
 
   return (
     <>
-      <View className="top-[5vh] bg-white w-[36vh] h-[5vh] self-center justify-center rounded-lg border-2 border-gray-300 absolute shadow-lg shadow-gray-900">
+      <View className="top-[2vh] bg-white w-[36vh] h-[5vh] self-center justify-center rounded-lg border-2 border-gray-300 absolute shadow-lg shadow-gray-900">
         <Text
           onPress={() => {
             Tts.speak(transWord);
@@ -111,13 +128,18 @@ const Word = ({
                 ? 'text-green-400'
                 : 'text-red-600'
               : 'text-black'
-          } font-bold self-center text-base underline decoration-dotted decoration-cyan-300`}>
-          {transWord === '' ? (transWord = 'Apple') : transWord.toUpperCase()}
+          } font-bold self-center text-lg underline decoration-dotted capitalize decoration-cyan-300`}>
+          {transWord === '' ? (transWord = 'Apple') : transWord}
         </Text>
-        <Button
-          className="top-[5vh]"
-          onPress={() => handleAddWord(word, transWord, from, to)}
+        <IconButton
+          iconColor={'orange'}
+          icon={require('../../assets/star.png')}
+          style={{position: 'absolute', width: 30, height: 30}}
+          onPress={() =>
+            handleAddWord(word, transWord, fromSpeechLang, toSpeechLang)
+          }
         />
+
         <IconButton
           onPress={!started ? startSpeechToText : stopSpeechToText}
           style={{position: 'absolute', right: 5, width: 30, height: 30}}

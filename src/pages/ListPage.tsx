@@ -1,7 +1,8 @@
 import React, {useEffect} from 'react';
 import {View, IconButton, VStack, Box, Text, CloseIcon} from 'native-base';
 import {ScrollView} from 'react-native-gesture-handler';
-import {useQuery, useRealm} from '../models/Words';
+import {useQuery, useRealm} from '../models/Lists';
+import CountryFlag from 'react-native-country-flag';
 
 const ListPage = ({navigation}: any) => {
   const words = useQuery<any>('Word');
@@ -10,20 +11,45 @@ const ListPage = ({navigation}: any) => {
 
   useEffect(() => {
     console.log(words);
+    console.log(
+      words.filter(
+        val => val.listName === navigation.getState().routes[2].params,
+      ),
+    );
   }, [words]);
 
   return (
-    <View className="w-[100%] h-[100%] bg-slate-900">
-      <VStack className="w-[90%] h-[80%] top-[2vh] self-center">
+    <View className="w-[100%] h-[100%] bg-lime-">
+      <VStack className="w-[95%] h-[100%] top-[2vh] self-center">
         <ScrollView>
-          {words.map(val => (
-            <>
-              <Box
-                key={val._objectKey()}
-                className="mt-[1vh] bg-white rounded-lg h-[6vh] justify-center">
-                <Text className="font-serif font-black text-lg absolute left-[2vh]">
-                  {val.word + ' => ' + val.transWord}
-                </Text>
+          {words
+            .filter(
+              val => val.listName === navigation.getState().routes[2].params,
+            )
+            .map(val => (
+              <>
+                <Box
+                  key={val._id}
+                  className="mt-[1vh] bg-white rounded-lg h-[10vh] w-[90%]">
+                  <View className="absolute left-[2vh] top-[1vh]">
+                    <CountryFlag
+                      style={{borderRadius: 4}}
+                      isoCode={String(val.from).split('-')[1]}
+                      size={24}
+                    />
+                  </View>
+
+                  <Text className="top-[5vh] capitalize font-serif font-black text-lg absolute self-center">
+                    {val.word + ' = ' + val.transWord}
+                  </Text>
+                  <View className="absolute right-[2vh] top-[1vh] self-end">
+                    <CountryFlag
+                      style={{borderRadius: 4}}
+                      isoCode={String(val.to).split('-')[1]}
+                      size={24}
+                    />
+                  </View>
+                </Box>
                 <IconButton
                   onPress={() => {
                     realm.write(() => {
@@ -34,14 +60,13 @@ const ListPage = ({navigation}: any) => {
                       );
                     });
                   }}
-                  className="h-[4vh] w-[4vh] rounded-lg absolute self-end right-[2vh]"
+                  className="h-[4vh] w-[4vh] rounded-lg self-end -top-[7vh]"
                   colorScheme="red"
                   icon={<CloseIcon />}
                   variant="solid"
                 />
-              </Box>
-            </>
-          ))}
+              </>
+            ))}
         </ScrollView>
       </VStack>
     </View>

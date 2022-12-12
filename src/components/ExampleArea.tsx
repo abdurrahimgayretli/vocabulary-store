@@ -17,7 +17,7 @@ const ExampleArea = ({
   from: LANG_TAGS_TYPE;
 }) => {
   const {isLoading, isError, data, refetch} = useQuery(['sentences'], () => {
-    return exampleSentences(enWord);
+    return exampleSentences(enWord === '' ? 'book' : enWord);
   });
   const [sentenceNow, setsentenceNow] = React.useState('');
   const [wordArray, setWordArray] = React.useState(['']);
@@ -81,7 +81,7 @@ const ExampleArea = ({
   // };
 
   return (
-    <View className="top-[15vh] bg-white w-[40vh] h-[20vh] self-center  rounded-lg border-2 border-gray-300 absolute shadow-lg shadow-gray-900">
+    <View className="top-[10vh] bg-white w-[40vh] h-[20vh] self-center  rounded-lg border-2 border-gray-300 absolute shadow-lg shadow-gray-900">
       <Text className="text-black font-bold pl-[3vh] pt-[2vh] text-base ">
         Example
       </Text>

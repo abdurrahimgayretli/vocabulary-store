@@ -8,9 +8,11 @@ import {fetchImage2} from '../api';
 
 const WordImage = ({word}: {word: string}) => {
   const {isLoading, isError, data, refetch} = useQuery(['images'], () =>
-    fetchImage2(word),
+    fetchImage2(word === null ? 'book' : word),
   );
-  const [imageURI, setImageURI] = useState('');
+  const [imageURI, setImageURI] = useState(
+    'https://images.pexels.com/photos/3358707/pexels-photo-3358707.png',
+  );
 
   React.useEffect(() => {
     refetch().then(() => {
@@ -21,7 +23,7 @@ const WordImage = ({word}: {word: string}) => {
   return (
     <>
       {isLoading && (
-        <View className="w-[40vh] h-[30vh] self-center top-[60vh] justify-center absolute">
+        <View className="w-[40vh] h-[30vh] self-center top-[55vh] justify-center absolute">
           <ActivityIndicator
             className="self-center"
             animating={true}
@@ -31,14 +33,18 @@ const WordImage = ({word}: {word: string}) => {
       )}
       {isError ? (
         <Image
-          className="w-[40vh] h-[30vh] top-[60vh] rounded-lg self-center absolute"
+          className="w-[40vh] h-[30vh] top-[55vh] rounded-lg self-center absolute"
           source={require('../../assets/Image_not_available.png')}
         />
       ) : (
-        <Image
-          className="w-[40vh] h-[30vh] top-[60vh] rounded-lg self-center absolute"
-          source={{uri: imageURI}}
-        />
+        <View className="border-gray-900 border-4 w-[40vh] h-[30vh] top-[55vh] rounded-lg self-center absolute">
+          <Image
+            className="object-fill h-full w-full"
+            source={{
+              uri: imageURI,
+            }}
+          />
+        </View>
       )}
     </>
   );

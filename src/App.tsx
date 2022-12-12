@@ -6,7 +6,7 @@ import {NativeBaseProvider} from 'native-base';
 import {NativeRouter, Route, Routes} from 'react-router-native';
 import StackNavigation from './components/StackNavigation';
 
-import {RealmProvider} from './models/Words';
+import {RealmProvider} from './models/Lists';
 
 export default function App() {
   const queryClient = new QueryClient({});

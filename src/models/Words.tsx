@@ -1,4 +1,4 @@
-import {Realm, createRealmContext} from '@realm/react';
+import {Realm} from '@realm/react';
 
 export class Words extends Realm.Object {
   _id!: Realm.BSON.ObjectId;
@@ -6,15 +6,23 @@ export class Words extends Realm.Object {
   transWord!: string;
   from!: string;
   to!: string;
+  listName!: string;
 
   // the Task.generate() method creates Task objects with fields with default values
-  static generate(word: string, transWord: string, from: string, to: string) {
+  static generate(
+    word: string,
+    transWord: string,
+    from: string,
+    to: string,
+    listName: string,
+  ) {
     return {
       _id: new Realm.BSON.ObjectId(),
       word,
       transWord,
       from,
       to,
+      listName,
     };
   }
 
@@ -28,9 +36,15 @@ export class Words extends Realm.Object {
       transWord: 'string',
       from: 'string',
       to: 'string',
+      listName: 'string',
     },
   };
 }
 
-export const {useRealm, useQuery, useObject, RealmProvider} =
-  createRealmContext({schema: [Words]});
+// const config = {
+//   schema: [Words],
+// };
+// export default createRealmContext(config);
+
+// export const {useRealm, useQuery, useObject, RealmProvider} =
+//   createRealmContext({schema: [Words]});
