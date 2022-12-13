@@ -4,6 +4,7 @@ import {Words} from './Words';
 export class Lists extends Realm.Object {
   _id!: Realm.BSON.ObjectId;
   listName!: string;
+  words!: Words[];
 
   // the Task.generate() method creates Task objects with fields with default values
   static generate(listName: string) {
@@ -20,6 +21,7 @@ export class Lists extends Realm.Object {
     properties: {
       _id: 'objectId',
       listName: 'string',
+      words: 'Word[]',
     },
   };
 }

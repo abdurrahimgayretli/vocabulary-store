@@ -8,8 +8,9 @@ import {IconButton} from 'react-native-paper';
 import Voice from '@react-native-voice/voice';
 import Tts from 'react-native-tts';
 import {LANG_TAGS_TYPE} from 'react-native-mlkit-translate-text/MLKitTranslator';
-import {useQuery, useRealm, Lists} from '../models/Lists';
+import {useQuery, useRealm} from '../models/Lists';
 import {Words} from '../models/Words';
+import AddListPopUp from './AddListPopUp';
 
 const Word = ({
   word,
@@ -31,35 +32,31 @@ const Word = ({
   const [started, setStarted] = useState(false);
   const [results, setResults] = useState(['']);
   const [pronunciation, setPronunciation] = useState(false);
-
   const realm = useRealm();
-  const handleAddLists = useCallback(
-    (listName: string, words: string[]): void => {
-      if (!word) {
-        return;
-      }
-      realm.write(() => {
-        realm.create('List', Lists.generate('My List'));
-      });
-    },
-    [realm],
-  );
-  const lists = useQuery('List');
+
+  const lists = useQuery<any>('List');
+
   const handleAddWord = useCallback(
-    (word: string, transWord: string, from: string, to: string): void => {
+    (
+      word: string,
+      transWord: string,
+      from: string,
+      to: string,
+      listName: string,
+    ): void => {
       if (!word) {
         return;
       }
       realm.write(() => {
-        realm.create(
+        const newWord = realm.create(
           'Word',
-          Words.generate(word, transWord, from, to, 'My List 2'),
+          Words.generate(word, transWord, from, to),
         );
+        lists.filter(val => val.listName === listName)[0].words.push(newWord);
       });
     },
     [realm],
   );
-  const words = useQuery('Word');
 
   useEffect(() => {
     Voice.onSpeechError = onSpeechError;
@@ -78,10 +75,6 @@ const Word = ({
     Tts.setDefaultLanguage(String(toSpeechLang));
     setResults(['']);
   }, [enWord, word]);
-
-  useEffect(() => {
-    console.log(words);
-  }, [realm]);
 
   const startSpeechToText = async () => {
     await Voice.start(String(toSpeechLang));
@@ -131,15 +124,10 @@ const Word = ({
           } font-bold self-center text-lg underline decoration-dotted capitalize decoration-cyan-300`}>
           {transWord === '' ? (transWord = 'Apple') : transWord}
         </Text>
-        <IconButton
-          iconColor={'orange'}
-          icon={require('../../assets/star.png')}
-          style={{position: 'absolute', width: 30, height: 30}}
-          onPress={() =>
-            handleAddWord(word, transWord, fromSpeechLang, toSpeechLang)
-          }
+        <AddListPopUp
+          addWordToList={handleAddWord}
+          wordInfo={{word, transWord, fromSpeechLang, toSpeechLang}}
         />
-
         <IconButton
           onPress={!started ? startSpeechToText : stopSpeechToText}
           style={{position: 'absolute', right: 5, width: 30, height: 30}}
@@ -147,6 +135,7 @@ const Word = ({
           icon={require('../../assets/microphone.png')}
         />
       </View>
+
       {/* <ExampleArea word={transWord} enWord={enWord} to={to} from={from} /> */}
       {/* <WordImage word={transWord} /> */}
     </>

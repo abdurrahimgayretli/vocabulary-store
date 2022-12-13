@@ -6,23 +6,15 @@ export class Words extends Realm.Object {
   transWord!: string;
   from!: string;
   to!: string;
-  listName!: string;
 
   // the Task.generate() method creates Task objects with fields with default values
-  static generate(
-    word: string,
-    transWord: string,
-    from: string,
-    to: string,
-    listName: string,
-  ) {
+  static generate(word: string, transWord: string, from: string, to: string) {
     return {
       _id: new Realm.BSON.ObjectId(),
       word,
       transWord,
       from,
       to,
-      listName,
     };
   }
 
@@ -36,7 +28,7 @@ export class Words extends Realm.Object {
       transWord: 'string',
       from: 'string',
       to: 'string',
-      listName: 'string',
+      list: {type: 'linkingObjects', objectType: 'List', property: 'words'},
     },
   };
 }
