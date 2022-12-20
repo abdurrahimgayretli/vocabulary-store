@@ -5,13 +5,18 @@ import {Lists, useQuery, useRealm} from '../models/Lists';
 import AddListModal from '../components/AddListModal';
 import PushNotification from 'react-native-push-notification';
 import {IconButton} from 'react-native-paper';
+import AddRemindModal from '../components/AddRemindModal';
 
 const ListsPage = ({navigation}: any) => {
   const lists = useQuery<any>('List');
 
   const [notifyName, setNotifyName] = useState('');
-  const [visible, setVisible] = React.useState(false);
-  const hidden = () => setVisible(false);
+  const [sizeList, setListSize] = useState(0);
+  const [visibleAddRemind, setVisibleAddRemind] = React.useState(false);
+  const hiddenAddRemind = () => setVisibleAddRemind(false);
+
+  const [visibleAddList, setVisibleAddList] = React.useState(false);
+  const hiddenAddList = () => setVisibleAddList(false);
 
   const realm = useRealm();
   const handleAddList = useCallback(
@@ -28,53 +33,38 @@ const ListsPage = ({navigation}: any) => {
 
   const changeIconFun = () => {
     PushNotification.getScheduledLocalNotifications(notification => {
-      notification.length !== 0 && setNotifyName(notification[0].title);
+      notification.length !== 0
+        ? setNotifyName(notification[0].title)
+        : setNotifyName('');
     });
   };
 
-  const showNotificationSchedule = (listName: string) => {
+  const showNotificationSchedule = (
+    time: number,
+    size: number,
+    listName: string,
+  ) => {
     PushNotification.localNotificationSchedule({
       allowWhileIdle: true,
       title: listName,
-      message: notifyMessage(listName),
+      message: notifyMessage(size, listName),
       channelId: '5',
-      date: new Date(Date.now() + 15 * 1000),
-      repeatType: 'time',
-      repeatTime: 15 * 1000,
+      date: new Date(Date.now() + time * size * 1000),
     });
   };
 
-  const notifyMessage = (listName: string) => {
-    const randomNumber = Math.random();
-    const word = lists.filter(val => val.listName === listName)[0].words[
-      Math.floor(
-        randomNumber *
-          lists.filter(val => val.listName === listName)[0].words.length,
-      )
-    ].word;
-    const trans = lists.filter(val => val.listName === listName)[0].words[
-      Math.floor(
-        randomNumber *
-          lists.filter(val => val.listName === listName)[0].words.length,
-      )
-    ].transWord;
+  const notifyMessage = (size: number, listName: string) => {
+    const word = lists.filter(val => val.listName === listName)[0].words[size]
+      .word;
+    const trans = lists.filter(val => val.listName === listName)[0].words[size]
+      .transWord;
     const from = lists
       .filter(val => val.listName === listName)[0]
-      .words[
-        Math.floor(
-          randomNumber *
-            lists.filter(val => val.listName === listName)[0].words.length,
-        )
-      ].from.split('-')[0]
+      .words[size].from.split('-')[0]
       .toUpperCase();
     const to = lists
       .filter(val => val.listName === listName)[0]
-      .words[
-        Math.floor(
-          randomNumber *
-            lists.filter(val => val.listName === listName)[0].words.length,
-        )
-      ].to.split('-')[0]
+      .words[size].to.split('-')[0]
       .toUpperCase();
 
     return from + ' > ' + word + ' = ' + trans + ' < ' + to;
@@ -82,16 +72,28 @@ const ListsPage = ({navigation}: any) => {
 
   useEffect(() => {
     changeIconFun();
-  });
+  }, []);
 
   return (
     <View className="w-[100%] h-[100%] bg-slate-300">
-      {visible && (
-        <View className="">
+      {visibleAddList && (
+        <View>
           <AddListModal
-            show={visible}
-            notShow={hidden}
+            show={visibleAddList}
+            notShow={hiddenAddList}
             addList={handleAddList}
+          />
+        </View>
+      )}
+      {visibleAddRemind && (
+        <View>
+          <AddRemindModal
+            size={sizeList}
+            setListName={setNotifyName}
+            listName={notifyName}
+            show={visibleAddRemind}
+            notShow={hiddenAddRemind}
+            addRemind={showNotificationSchedule}
           />
         </View>
       )}
@@ -137,8 +139,10 @@ const ListsPage = ({navigation}: any) => {
                     size={28}
                     onPress={() => {
                       PushNotification.cancelAllLocalNotifications();
-                      showNotificationSchedule(val.listName);
+
                       setNotifyName(val.listName);
+                      setListSize(val.words.length);
+                      setVisibleAddRemind(true);
                     }}
                     icon={require('../../assets/notifications-active.png')}
                   />
@@ -162,7 +166,7 @@ const ListsPage = ({navigation}: any) => {
             iconColor={'blue'}
             size={48}
             onPress={() => {
-              setVisible(true);
+              setVisibleAddList(true);
             }}
             icon={require('../../assets/playlist-add.png')}
           />
