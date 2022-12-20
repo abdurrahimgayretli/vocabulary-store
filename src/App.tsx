@@ -10,6 +10,7 @@ import {RealmProvider} from './models/Lists';
 
 export default function App() {
   const queryClient = new QueryClient({});
+
   return (
     <PaperProvider>
       <NativeBaseProvider>

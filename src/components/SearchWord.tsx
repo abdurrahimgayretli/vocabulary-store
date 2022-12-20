@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react';
-import {View, TextInput} from 'react-native';
+import {View, TextInput, Keyboard} from 'react-native';
 import MLKitTranslator, {
   LANG_TAGS_TYPE,
 } from 'react-native-mlkit-translate-text/MLKitTranslator';
@@ -56,6 +56,7 @@ const SearchWord = ({to, from, toSpeechLang, fromSpeechLang}: props) => {
           style={{alignSelf: 'center'}}
           iconColor="black"
           onPress={async () => {
+            Keyboard.dismiss();
             setTransWord(
               String(await MLKitTranslator.translateText(text, from, to)),
             );

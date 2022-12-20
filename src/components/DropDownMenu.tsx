@@ -29,6 +29,7 @@ const DropDownMenu = () => {
       />
       <View className="absolute h-[7vh] top-[35vh] w-[16vh] left-[4vh] ">
         <SelectList
+          search={false}
           boxStyles={{
             backgroundColor: 'white',
             borderRadius: 8,
@@ -50,6 +51,7 @@ const DropDownMenu = () => {
       </View>
       <View className="absolute h-[7vh] top-[35vh] w-[16vh] right-[4vh]">
         <SelectList
+          search={false}
           boxStyles={{
             backgroundColor: 'white',
             borderRadius: 8,

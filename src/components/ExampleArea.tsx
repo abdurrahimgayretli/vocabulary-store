@@ -94,7 +94,7 @@ const ExampleArea = ({
             ) : (
               <>
                 <Text>{wordArray[0]}</Text>
-                <Text className="font-bold">{enWord}</Text>
+                <Text className="font-bold">{enWord.toLowerCase()}</Text>
                 <Text>{wordArray[1]}</Text>
               </>
             )}

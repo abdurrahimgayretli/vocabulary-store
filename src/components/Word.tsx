@@ -72,9 +72,12 @@ const Word = ({
 
   useEffect(() => {
     setPronunciation(false);
-    Tts.setDefaultLanguage(String(toSpeechLang));
     setResults(['']);
-  }, [enWord, word]);
+  }, [transWord]);
+
+  useEffect(() => {
+    Tts.setDefaultLanguage(String(toSpeechLang));
+  }, [toSpeechLang]);
 
   const startSpeechToText = async () => {
     await Voice.start(String(toSpeechLang));
@@ -136,8 +139,8 @@ const Word = ({
         />
       </View>
 
-      {/* <ExampleArea word={transWord} enWord={enWord} to={to} from={from} /> */}
-      {/* <WordImage word={transWord} /> */}
+      <ExampleArea word={transWord} enWord={enWord} to={to} from={from} />
+      <WordImage word={enWord} />
     </>
   );
 };
