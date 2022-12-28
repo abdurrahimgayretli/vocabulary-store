@@ -1,4 +1,4 @@
-package com.remindword;
+package com.vocabulary.store;
 
 import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactActivityDelegate;

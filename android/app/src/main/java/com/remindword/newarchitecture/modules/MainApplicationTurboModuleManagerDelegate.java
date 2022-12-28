@@ -1,4 +1,4 @@
-package com.remindword.newarchitecture.modules;
+package com.vocabulary.store.newarchitecture.modules;
 
 import com.facebook.jni.HybridData;
 import com.facebook.react.ReactPackage;

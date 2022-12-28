@@ -4,11 +4,11 @@ import {useQuery} from '@tanstack/react-query';
 import React, {useState} from 'react';
 import {Image, View} from 'react-native';
 import {ActivityIndicator, MD2Colors} from 'react-native-paper';
-import {fetchImage2} from '../api';
+import {fetchImage} from '../api';
 
 const WordImage = ({word}: {word: string}) => {
   const {isLoading, isError, data, refetch} = useQuery(['images'], () =>
-    fetchImage2(word === null ? 'book' : word),
+    fetchImage(word === null ? 'book' : word),
   );
   const [imageURI, setImageURI] = useState(
     'https://images.pexels.com/photos/3358707/pexels-photo-3358707.png',

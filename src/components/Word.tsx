@@ -77,7 +77,7 @@ const Word = ({
 
   useEffect(() => {
     Tts.setDefaultLanguage(String(toSpeechLang));
-  }, [toSpeechLang]);
+  }, [transWord]);
 
   const startSpeechToText = async () => {
     await Voice.start(String(toSpeechLang));
