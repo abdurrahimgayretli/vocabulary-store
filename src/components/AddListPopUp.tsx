@@ -1,12 +1,41 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import {Popover, Box, View, Text, ScrollView} from 'native-base';
-import React, {useState} from 'react';
+import React, {useCallback, useState} from 'react';
 import {IconButton} from 'react-native-paper';
-import {useQuery} from '../models/Lists';
+import {Lists, useQuery, useRealm} from '../models/Lists';
+import {useAppSelector} from '../redux/hooks';
+import {selectWord} from '../redux/state/word';
+import {Words} from '../models/Words';
 
-const AddListPopUp = ({wordInfo, addWordToList}: any) => {
+const AddListPopUp = () => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const lists = useQuery<any>('List');
+  const lists = useQuery<Lists>('List');
+  const realm = useRealm();
+
+  const wordContent = useAppSelector(selectWord);
+
+  const handleAddWord = useCallback(
+    (
+      word: string,
+      transWord: string,
+      source: string,
+      target: string,
+      listName: string,
+    ): void => {
+      if (!word) {
+        return;
+      }
+      realm.write(() => {
+        const newWord: Words = realm.create(
+          'Word',
+          Words.generate(word, transWord, source, target),
+        );
+        lists.filter(val => val.listName === listName)[0].words.push(newWord);
+      });
+    },
+    [realm],
+  );
 
   return (
     <Box className="absolute">
@@ -32,16 +61,18 @@ const AddListPopUp = ({wordInfo, addWordToList}: any) => {
           <Popover.Header>Select List</Popover.Header>
           <Popover.Body>
             <ScrollView>
-              {lists.map(val => (
-                <Box key={val._id} className="mb-[1vh] h-[5vh] w-[100%] ">
+              {lists.map((val: Lists) => (
+                <Box
+                  key={Number(val._id)}
+                  className="mb-[1vh] h-[5vh] w-[100%] ">
                   <View
                     onTouchEnd={() => {
                       setIsOpen(false);
-                      addWordToList(
-                        wordInfo.word,
-                        wordInfo.transWord,
-                        wordInfo.fromSpeechLang,
-                        wordInfo.toSpeechLang,
+                      handleAddWord(
+                        wordContent.word,
+                        wordContent.transWord,
+                        wordContent.sourceSpeechLang,
+                        wordContent.targetSpeechLang,
                         val.listName,
                       );
                     }}

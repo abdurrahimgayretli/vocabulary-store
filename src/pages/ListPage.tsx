@@ -1,11 +1,12 @@
 import React from 'react';
 import {View, IconButton, VStack, Box, Text, CloseIcon} from 'native-base';
 import {ScrollView} from 'react-native-gesture-handler';
-import {useQuery, useRealm} from '../models/Lists';
+import {Lists, useQuery, useRealm} from '../models/Lists';
 import CountryFlag from 'react-native-country-flag';
+import {Words} from '../models/Words';
 
 const ListPage = ({navigation}: any) => {
-  const lists = useQuery<any>('List');
+  const lists = useQuery<Lists>('List');
   const realm = useRealm();
 
   return (
@@ -16,15 +17,15 @@ const ListPage = ({navigation}: any) => {
             .filter(
               val => val.listName === navigation.getState().routes[2].params,
             )[0]
-            .words.map((elem: any) => (
+            .words.map((elem: Words) => (
               <Box
-                key={elem._id}
+                key={String(elem._id)}
                 className="mt-[1vh] rounded-lg h-[10vh] w-[100%]">
                 <View className="h-[100%] w-[90%] bg-white rounded-lg">
                   <View className="absolute left-[2vh] top-[1vh]">
                     <CountryFlag
                       style={{borderRadius: 4}}
-                      isoCode={String(elem.from).split('-')[1]}
+                      isoCode={String(elem.soruce).split('-')[1]}
                       size={24}
                     />
                   </View>
@@ -35,7 +36,7 @@ const ListPage = ({navigation}: any) => {
                   <View className="absolute right-[2vh] top-[1vh] self-end">
                     <CountryFlag
                       style={{borderRadius: 4}}
-                      isoCode={String(elem.to).split('-')[1]}
+                      isoCode={String(elem.target).split('-')[1]}
                       size={24}
                     />
                   </View>

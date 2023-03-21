@@ -1,13 +1,16 @@
 /**
  * @format
  */
-
+import React from 'react';
 import {AppRegistry} from 'react-native';
 import App from './src/App';
 import {name as appName} from './app.json';
 
 import PushNotification from 'react-native-push-notification';
 import {Platform} from 'react-native';
+
+import {Provider} from 'react-redux';
+import {store} from './src/redux/store';
 
 PushNotification.configure({
   onRegister: function (token) {
@@ -41,4 +44,10 @@ PushNotification.createChannel(
   created => console.log(`createChannel returned '${created}'`), // (optional) callback returns whether the channel was created, false means it already existed.
 );
 
-AppRegistry.registerComponent(appName, () => App);
+const AppWrapper = () => (
+  <Provider store={store}>
+    <App></App>
+  </Provider>
+);
+
+AppRegistry.registerComponent(appName, () => AppWrapper);

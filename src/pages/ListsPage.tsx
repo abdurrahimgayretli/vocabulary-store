@@ -163,7 +163,7 @@ const ListsPage = ({navigation}: any) => {
         </ScrollView>
         <View className="h-[6vh] w-[6vh] rounded-lg absolute bottom-[6vh] right-[2vh] self-end">
           <IconButton
-            iconColor={'blue'}
+            iconColor={'black'}
             size={48}
             onPress={() => {
               setVisibleAddList(true);

@@ -7,70 +7,55 @@ import {SelectList} from 'react-native-dropdown-select-list';
 import {LANG_TAGS_TYPE} from 'react-native-mlkit-translate-text/MLKitTranslator';
 import SearchWord from '../components/SearchWord';
 import {IconButton} from 'react-native-paper';
+import DropDownPicker from 'react-native-dropdown-picker';
 
 const DropDownMenu = () => {
+  const [access, setAccess] = useState(true);
   const [change, setChange] = useState(false);
-  const [fromSelected, setSelectedFrom] =
-    React.useState<LANG_TAGS_TYPE>('ENGLISH');
-  const [toSelected, setSelectedTo] = React.useState<LANG_TAGS_TYPE>('TURKISH');
-  const [fromSpeechLang, setFromSpeechLang] = React.useState('en-GB');
-  const [toSpeechLang, setToSpeechLang] = React.useState('tr-TR');
-  const [temp, setTemp] = useState<LANG_TAGS_TYPE>('TURKISH');
+  const [openSource, setOpenSource] = useState(false);
+  const [openTarget, setOpenTarget] = useState(false);
+  const [source, setSource] = useState<LANG_TAGS_TYPE>('TURKISH');
+  const [target, setTarget] = useState<LANG_TAGS_TYPE>('ENGLISH');
+  const [soruceSpeechLang, setSourceSpeechLang] = useState('tr-TR');
+  const [targetSpeechLang, setTargetSpeechLang] = useState('en-GB');
 
-  const data = [
-    {key: 'TURKISH', value: 'TURKISH', speechLang: 'tr-TR'},
-    {key: 'ENGLISH', value: 'ENGLISH', speechLang: 'en-GB'},
-    {key: 'RUSSIAN', value: 'RUSSIAN', speechLang: 'ru-RU'},
+  const lang = [
+    {label: 'TURKISH', value: 'TURKISH', speechLang: 'tr-TR'},
+    {label: 'ENGLISH', value: 'ENGLISH', speechLang: 'en-GB'},
+    {label: 'RUSSIAN', value: 'RUSSIAN', speechLang: 'ru-RU'},
   ];
-
-  useEffect(() => {
-    setSelectedTo(fromSelected);
-    setSelectedFrom(toSelected);
-    setToSpeechLang(fromSpeechLang);
-    setFromSpeechLang(toSpeechLang);
-  }, [change]);
 
   return (
     <>
       <SearchWord
-        to={toSelected}
-        from={fromSelected}
-        toSpeechLang={toSpeechLang}
-        fromSpeechLang={fromSpeechLang}
+        source={!change ? source : target}
+        target={change ? source : target}
+        sourceSpeechLang={!change ? soruceSpeechLang : targetSpeechLang}
+        targetSpeechLang={change ? soruceSpeechLang : targetSpeechLang}
       />
       <View
-        className={`absolute h-[7vh] top-[35vh] w-[16vh] ${
-          change ? 'right-[4vh]' : 'left-[4vh]'
-        } `}>
-        <SelectList
-          search={false}
-          boxStyles={{
-            backgroundColor: 'white',
-            borderRadius: 8,
-            borderColor: '#D0D5DD',
-          }}
-          dropdownItemStyles={{backgroundColor: 'white'}}
-          defaultOption={data[0]}
-          setSelected={(val: LANG_TAGS_TYPE) => {
+        className={
+          'shadow-lg shadow-gray-900 absolute h-[7vh] top-[35vh] w-[16vh] left-[4vh]'
+        }>
+        <DropDownPicker
+          labelStyle={{borderColor: 'gray'}}
+          placeholder="Lang
+        "
+          onSelectItem={(val: any) => {
             if (!change) {
-              setSelectedFrom(val);
-              data.forEach(from => {
-                String(val) === from.value
-                  ? setFromSpeechLang(from.speechLang)
-                  : '';
-              });
+              setSourceSpeechLang(val.speechLang);
             } else {
-              setSelectedTo(val);
-              data.forEach(to => {
-                String(val) === to.value ? setToSpeechLang(to.speechLang) : '';
-              });
+              setTargetSpeechLang(val.speechLang);
             }
           }}
-          data={data}
-          save="value"
+          open={!change ? openSource : openTarget}
+          value={!change ? source : target}
+          items={lang}
+          setOpen={!change ? setOpenSource : setOpenTarget}
+          setValue={!change ? setSource : setTarget}
         />
       </View>
-      <View className="absolute top-[35.5vh] self-center bg-white border-2 h-[5vh] w-[5vh] justify-center rounded-lg">
+      <View className="absolute top-[35.5vh] self-center bg-white border-2 h-[5vh] w-[5vh] justify-center rounded-lg shadow-lg shadow-gray-900">
         <IconButton
           iconColor="black"
           onPress={() => {
@@ -80,36 +65,22 @@ const DropDownMenu = () => {
           icon={require('../../assets/arrows-right-left.png')}
         />
       </View>
-      <View
-        className={`absolute h-[7vh] top-[35vh] w-[16vh] ${
-          !change ? 'right-[4vh]' : 'left-[4vh]'
-        } `}>
-        <SelectList
-          search={false}
-          boxStyles={{
-            backgroundColor: 'white',
-            borderRadius: 8,
-            borderColor: '#D0D5DD',
-          }}
-          dropdownItemStyles={{backgroundColor: 'white'}}
-          defaultOption={data[1]}
-          setSelected={(val: LANG_TAGS_TYPE) => {
-            if (!change) {
-              setSelectedTo(val);
-              data.forEach((to, i) => {
-                String(val) === to.value ? setToSpeechLang(to.speechLang) : '';
-              });
+      <View className={'absolute h-[7vh] top-[35vh] w-[16vh] right-[4vh]'}>
+        <DropDownPicker
+          placeholder="Lang
+        "
+          onSelectItem={(val: any) => {
+            if (change) {
+              setSourceSpeechLang(val.speechLang);
             } else {
-              setSelectedFrom(val);
-              data.forEach(from => {
-                String(val) === from.value
-                  ? setFromSpeechLang(from.speechLang)
-                  : '';
-              });
+              setTargetSpeechLang(val.speechLang);
             }
           }}
-          data={data}
-          save="value"
+          open={change ? openSource : openTarget}
+          value={change ? source : target}
+          items={lang}
+          setOpen={change ? setOpenSource : setOpenTarget}
+          setValue={change ? setSource : setTarget}
         />
       </View>
     </>

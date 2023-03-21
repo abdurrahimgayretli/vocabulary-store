@@ -1,11 +1,17 @@
 /* eslint-disable react/react-in-jsx-scope */
 import {View} from 'react-native';
-import TranslateWordPage from '../components/DropDownMenu';
+import DropDownMenu from '../components/DropDownMenu';
+import Word from '../components/Word';
+import ExampleArea from '../components/ExampleArea';
+import WordImage from '../components/WordImage';
 
 export default function TranslatePage() {
   return (
     <View>
-      <TranslateWordPage />
+      <WordImage />
+      <Word />
+      <DropDownMenu />
+      <ExampleArea />
     </View>
   );
 }

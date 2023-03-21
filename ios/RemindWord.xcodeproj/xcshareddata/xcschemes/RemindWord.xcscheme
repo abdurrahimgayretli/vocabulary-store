@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-               BuildableName = "RemindWord.app"
-               BlueprintName = "RemindWord"
-               ReferencedContainer = "container:RemindWord.xcodeproj">
+               BuildableName = "VocabularyStore.app"
+               BlueprintName = "VocabularyStore"
+               ReferencedContainer = "container:VocabularyStore.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "00E356ED1AD99517003FC87E"
-               BuildableName = "RemindWordTests.xctest"
-               BlueprintName = "RemindWordTests"
-               ReferencedContainer = "container:RemindWord.xcodeproj">
+               BuildableName = "VocabularyStoreTests.xctest"
+               BlueprintName = "VocabularyStoreTests"
+               ReferencedContainer = "container:VocabularyStore.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -55,9 +55,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "RemindWord.app"
-            BlueprintName = "RemindWord"
-            ReferencedContainer = "container:RemindWord.xcodeproj">
+            BuildableName = "VocabularyStore.app"
+            BlueprintName = "VocabularyStore"
+            ReferencedContainer = "container:VocabularyStore.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -72,9 +72,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "RemindWord.app"
-            BlueprintName = "RemindWord"
-            ReferencedContainer = "container:RemindWord.xcodeproj">
+            BuildableName = "VocabularyStore.app"
+            BlueprintName = "VocabularyStore"
+            ReferencedContainer = "container:VocabularyStore.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

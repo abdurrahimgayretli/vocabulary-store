@@ -1,6 +1,6 @@
 {
-  "name": "RemindWord",
-  "displayName": "RemindWord",
+  "name": "VocabularyStore",
+  "displayName": "VocabularyStore",
   "plugins": [
     [
       "@react-native-voice/voice",

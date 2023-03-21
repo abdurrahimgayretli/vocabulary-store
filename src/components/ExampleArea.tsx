@@ -3,41 +3,60 @@ import {View, Text} from 'react-native';
 import React, {useEffect} from 'react';
 import {exampleSentences} from '../api';
 import {useQuery} from '@tanstack/react-query';
-import {LANG_TAGS_TYPE} from 'react-native-mlkit-translate-text/MLKitTranslator';
 import {ScrollView} from 'native-base';
 import Synonyms from './Synonyms';
+import {useAppDispatch, useAppSelector} from '../redux/hooks';
+import {
+  example,
+  selectWord,
+  setSentence,
+  control,
+  setControl,
+} from '../redux/state/word';
 
-const ExampleArea = ({
-  enWord,
-}: {
-  enWord: string;
-  word: string;
-  to: LANG_TAGS_TYPE;
-  from: LANG_TAGS_TYPE;
-}) => {
+const ExampleArea = () => {
+  const wordContent = useAppSelector(selectWord);
+  const exampleContent = useAppSelector(example);
+  const controlContent = useAppSelector(control);
+
+  const dispatch = useAppDispatch();
+
   const {isLoading, isError, data, refetch} = useQuery(['sentences'], () => {
-    return exampleSentences(enWord === '' ? 'book' : enWord);
+    return wordContent.enWord.toLowerCase() === 'book' || controlContent.control
+      ? exampleContent.sentence
+      : exampleSentences(wordContent.enWord);
   });
-  const [sentenceNow, setsentenceNow] = React.useState('');
   const [wordArray, setWordArray] = React.useState(['']);
 
   useEffect(() => {
     refetch();
-  }, [enWord]);
+  }, [wordContent.enWord]);
 
   useEffect(() => {
     if (data !== undefined) {
-      setsentenceNow(data);
+      dispatch(
+        setSentence({
+          sentence: data,
+          synonyms: exampleContent.synonyms,
+        }),
+      );
     }
   }, [data]);
 
   useEffect(() => {
-    if (sentenceNow !== null) {
-      setWordArray(
-        sentenceNow.split(enWord === '' ? 'Apple' : enWord.toLocaleLowerCase()),
-      );
+    if (exampleContent.sentence !== null) {
+      setWordArray(exampleContent.sentence.split(wordContent.enWord));
     }
-  }, [sentenceNow]);
+    console.log(exampleContent.sentence);
+  }, [exampleContent.sentence]);
+
+  useEffect(() => {
+    dispatch(setControl({control: false}));
+    return () => {
+      dispatch(setControl({control: true}));
+      console.log(controlContent.control);
+    };
+  }, []);
 
   return (
     <View className="top-[10vh] bg-white w-[40vh] h-[20vh] self-center  rounded-lg border-2 border-gray-300 absolute shadow-lg shadow-gray-900">
@@ -47,25 +66,28 @@ const ExampleArea = ({
         </Text>
         <View className="justify-center">
           <Text className="pl-[4vh] pr-[4vh] text-black text-base">
-            <>
-              {isLoading && 'Loading...'}
-              {isError ? (
-                'Sentence Not Found!!!'
-              ) : (
-                <>
-                  <Text>{wordArray[0]}</Text>
-                  <Text className="font-bold">{enWord.toLowerCase()}</Text>
-                  <Text>{wordArray[1]}</Text>
-                </>
-              )}
-            </>
+            {isLoading ? (
+              'Loading...'
+            ) : isError ? (
+              'Sentence Not Found!!!'
+            ) : data === null ? (
+              'Sentence Not Found!!!'
+            ) : (
+              <Text>
+                {wordArray[0]}
+                <Text className="font-bold">
+                  {wordContent.enWord.toLowerCase()}
+                </Text>
+                {wordArray[1]}
+              </Text>
+            )}
           </Text>
         </View>
         <View>
           <Text className="text-black font-bold pl-[3vh] text-base ">
             Synonyms
           </Text>
-          <Synonyms word={enWord} />
+          <Synonyms />
         </View>
       </ScrollView>
     </View>

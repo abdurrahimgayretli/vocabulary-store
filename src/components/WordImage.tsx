@@ -1,24 +1,25 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
 import {useQuery} from '@tanstack/react-query';
-import React, {useState} from 'react';
+import React from 'react';
 import {Image, View} from 'react-native';
 import {ActivityIndicator, MD2Colors} from 'react-native-paper';
 import {fetchImage} from '../api';
+import {useAppSelector} from '../redux/hooks';
+import {selectWord} from '../redux/state/word';
 
-const WordImage = ({word}: {word: string}) => {
+const WordImage = () => {
+  const wordContent = useAppSelector(selectWord);
+
   const {isLoading, isError, data, refetch} = useQuery(['images'], () =>
-    fetchImage(word === null ? 'book' : word),
-  );
-  const [imageURI, setImageURI] = useState(
-    'https://images.pexels.com/photos/3358707/pexels-photo-3358707.png',
+    wordContent.enWord.toLowerCase() === 'book'
+      ? 'https://images.pexels.com/photos/3358707/pexels-photo-3358707.png'
+      : fetchImage(wordContent.enWord),
   );
 
   React.useEffect(() => {
-    refetch().then(() => {
-      setImageURI(data);
-    });
-  }, [data, word]);
+    refetch();
+  }, [wordContent.enWord]);
 
   return (
     <>
@@ -41,7 +42,7 @@ const WordImage = ({word}: {word: string}) => {
           <Image
             className="object-fill h-full w-full"
             source={{
-              uri: imageURI,
+              uri: data,
             }}
           />
         </View>
