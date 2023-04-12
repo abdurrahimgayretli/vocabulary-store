@@ -63,7 +63,7 @@ const AddListPopUp = () => {
             <ScrollView>
               {lists.map((val: Lists) => (
                 <Box
-                  key={Number(val._id)}
+                  key={String(val._id)}
                   className="mb-[1vh] h-[5vh] w-[100%] ">
                   <View
                     onTouchEnd={() => {

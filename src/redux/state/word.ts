@@ -12,8 +12,9 @@ export interface WordType {
   targetSpeechLang: string;
 }
 export interface ExampleType {
+  image: string;
   sentence: string;
-  synonyms: string[];
+  synonyms: [{partOfSpeech: string; synonyms: string[]}];
 }
 export interface ControlType {
   control: boolean;
@@ -35,8 +36,21 @@ const initialState: WordState = {
     targetSpeechLang: 'en-GB',
   },
   wordExample: {
+    image: 'https://images.pexels.com/photos/3358707/pexels-photo-3358707.png',
     sentence: 'A book of selected poems',
-    synonyms: ['tome', 'volume', 'booklet', 'libretto', 'account', 'record'],
+    synonyms: [
+      {
+        partOfSpeech: 'noun',
+        synonyms: [
+          'tome',
+          'volume',
+          'booklet',
+          'libretto',
+          'account',
+          'record',
+        ],
+      },
+    ],
   },
   wordControl: {control: false},
 };
@@ -47,6 +61,9 @@ const wordSlice = createSlice({
   reducers: {
     setWordContent: (state, action: PayloadAction<WordType>) => {
       state.wordContent = action.payload;
+    },
+    setImage: (state, action: PayloadAction<ExampleType>) => {
+      state.wordExample.image = action.payload.image;
     },
     setSynonyms: (state, action: PayloadAction<ExampleType>) => {
       state.wordExample.synonyms = action.payload.synonyms;
@@ -63,6 +80,8 @@ const wordSlice = createSlice({
 export const {setWordContent} = wordSlice.actions;
 export const {setSynonyms} = wordSlice.actions;
 export const {setSentence} = wordSlice.actions;
+export const {setImage} = wordSlice.actions;
+
 export const {setControl} = wordSlice.actions;
 
 export const selectWord = (state: RootState) => state.word.wordContent;

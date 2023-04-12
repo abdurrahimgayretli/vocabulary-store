@@ -38,6 +38,7 @@ const ExampleArea = () => {
         setSentence({
           sentence: data,
           synonyms: exampleContent.synonyms,
+          image: exampleContent.image,
         }),
       );
     }
@@ -45,16 +46,18 @@ const ExampleArea = () => {
 
   useEffect(() => {
     if (exampleContent.sentence !== null) {
-      setWordArray(exampleContent.sentence.split(wordContent.enWord));
+      setWordArray(
+        exampleContent.sentence
+          .toLowerCase()
+          .split(wordContent.enWord.toLowerCase()),
+      );
     }
-    console.log(exampleContent.sentence);
   }, [exampleContent.sentence]);
 
   useEffect(() => {
     dispatch(setControl({control: false}));
     return () => {
       dispatch(setControl({control: true}));
-      console.log(controlContent.control);
     };
   }, []);
 

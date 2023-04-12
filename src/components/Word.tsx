@@ -33,7 +33,6 @@ const Word = () => {
     Tts.setDefaultLanguage(String(wordContent.targetSpeechLang));
     setPronunciation(false);
     setResults(['']);
-    console.log(wordContent.targetSpeechLang);
   }, [wordContent.transWord]);
 
   const startSpeechToText = async () => {
@@ -70,7 +69,7 @@ const Word = () => {
 
   return (
     <>
-      <View className="top-[2vh] bg-white w-[36vh] h-[5vh] self-center justify-center rounded-lg border-2 border-gray-300 absolute shadow-lg shadow-gray-900">
+      <View className="top-[2vh] bg-white w-[40vh] h-[5vh] self-center justify-center rounded-lg border-2 border-gray-300 absolute shadow-lg shadow-gray-900">
         <Text
           onPress={() => {
             Tts.speak(wordContent.transWord);

@@ -11,7 +11,11 @@ const StackNavigation = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Welcome">
-        <Stack.Screen name="Welcome" component={LoginPage} />
+        <Stack.Screen
+          options={{headerShown: false}}
+          name="Welcome"
+          component={LoginPage}
+        />
         <Stack.Screen name="Translate" component={TranslatePage} />
         <Stack.Screen name="Lists of Words" component={ListsPage} />
         <Stack.Screen name="Word's List" component={ListPage} />

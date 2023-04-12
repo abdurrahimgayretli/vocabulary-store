@@ -1,36 +1,48 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import {useQuery} from '@tanstack/react-query';
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {fetchSynonyms} from '../api';
 import {Text, View} from 'native-base';
 import {ActivityIndicator, MD2Colors} from 'react-native-paper';
-import {useAppSelector} from '../redux/hooks';
-import {selectWord} from '../redux/state/word';
+import {useAppDispatch, useAppSelector} from '../redux/hooks';
+import {control, example, selectWord, setSynonyms} from '../redux/state/word';
 
 const Synonyms = () => {
   const wordContent = useAppSelector(selectWord);
+  const exampleContent = useAppSelector(example);
+  const controlContent = useAppSelector(control);
+
+  const [syn, setSyn] = useState(exampleContent.synonyms);
+
+  const dispatch = useAppDispatch();
 
   const {isLoading, isError, data, refetch} = useQuery(['synonyms'], () =>
-    wordContent.enWord.toLowerCase() === 'book'
-      ? [
-          {
-            partOfSpeech: 'noun',
-            synonyms: [
-              'tome',
-              'volume',
-              'booklet',
-              'libretto',
-              'account',
-              'record',
-            ],
-          },
-        ]
+    wordContent.enWord.toLowerCase() === 'book' || controlContent.control
+      ? exampleContent.synonyms
       : fetchSynonyms(wordContent.enWord),
   );
 
   useEffect(() => {
     refetch();
   }, [wordContent.enWord]);
+
+  useEffect(() => {
+    if (data !== undefined) {
+      dispatch(
+        setSynonyms({
+          sentence: exampleContent.sentence,
+          synonyms: data,
+          image: exampleContent.image,
+        }),
+      );
+    }
+  }, [data]);
+
+  useEffect(() => {
+    if (exampleContent.synonyms !== null) {
+      setSyn(exampleContent.synonyms);
+    }
+  }, [exampleContent.synonyms]);
 
   return (
     <View className="pl-[4vh] pr-[4vh]">
@@ -46,16 +58,16 @@ const Synonyms = () => {
       <Text className="text-black text-sm">
         {isError
           ? 'Synonyms Not Found!!!'
-          : data?.[0].synonyms[0] === undefined
+          : syn?.[0].synonyms[0] === undefined
           ? 'Synonyms Not Found!!!'
-          : data?.map((val: any, i: number) => (
+          : syn?.map((val: any, i: number) => (
               <Text className="capitalize font-semibold" key={i}>
                 {val.synonyms[0] !== undefined && (
                   <>
                     {val.partOfSpeech + ' : '}
                     <Text className="lowercase font-normal">
-                      {val.synonyms.map((syn: any) => {
-                        return syn + ', ';
+                      {val.synonyms.map((syns: any) => {
+                        return syns + ', ';
                       })}
                       {'\n'}
                     </Text>

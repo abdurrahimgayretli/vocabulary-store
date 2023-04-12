@@ -10,7 +10,7 @@ const ListPage = ({navigation}: any) => {
   const realm = useRealm();
 
   return (
-    <View className="w-[100%] h-[100%] bg-slate-300">
+    <View className="w-[100%] h-[100%] ">
       <VStack className="w-[95%] h-[95%] top-[2vh] self-center">
         <ScrollView>
           {lists

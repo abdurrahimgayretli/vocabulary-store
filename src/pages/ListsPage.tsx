@@ -8,7 +8,7 @@ import {IconButton} from 'react-native-paper';
 import AddRemindModal from '../components/AddRemindModal';
 
 const ListsPage = ({navigation}: any) => {
-  const lists = useQuery<any>('List');
+  const lists = useQuery<Lists>('List');
 
   const [notifyName, setNotifyName] = useState('');
   const [sizeList, setListSize] = useState(0);
@@ -60,11 +60,11 @@ const ListsPage = ({navigation}: any) => {
       .transWord;
     const from = lists
       .filter(val => val.listName === listName)[0]
-      .words[size].from.split('-')[0]
+      .words[size].soruce.split('-')[0]
       .toUpperCase();
     const to = lists
       .filter(val => val.listName === listName)[0]
-      .words[size].to.split('-')[0]
+      .words[size].target.split('-')[0]
       .toUpperCase();
 
     return from + ' > ' + word + ' = ' + trans + ' < ' + to;
@@ -75,7 +75,7 @@ const ListsPage = ({navigation}: any) => {
   }, []);
 
   return (
-    <View className="w-[100%] h-[100%] bg-slate-300">
+    <View className="w-[100%] h-[100%] ">
       {visibleAddList && (
         <View>
           <AddListModal
@@ -99,8 +99,10 @@ const ListsPage = ({navigation}: any) => {
       )}
       <VStack className="w-[90%] h-[100%] top-[2vh] self-center">
         <ScrollView>
-          {lists.map(val => (
-            <Box key={val._id} className=" mt-[0.5vh] h-[6vh] w-[100%] ">
+          {lists.map((val: Lists) => (
+            <Box
+              key={String(val._id)}
+              className=" mt-[0.5vh] h-[6vh] w-[100%] ">
               <View
                 onTouchStart={() => {
                   navigation.navigate("Word's List", val.listName);
@@ -131,7 +133,6 @@ const ListsPage = ({navigation}: any) => {
                   icon={require('../../assets/close.png')}
                 />
               </View>
-
               <View className="absolute self-end -top-[1vh] right-[5vh]">
                 {val.listName !== notifyName ? (
                   <IconButton
