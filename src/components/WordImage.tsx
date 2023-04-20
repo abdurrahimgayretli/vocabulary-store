@@ -7,6 +7,7 @@ import {ActivityIndicator, MD2Colors} from 'react-native-paper';
 import {fetchImage} from '../api';
 import {useAppDispatch, useAppSelector} from '../redux/hooks';
 import {control, example, selectWord, setImage} from '../redux/state/word';
+import {heightPercentageToDP as hp} from 'react-native-responsive-screen';
 
 const WordImage = () => {
   const wordContent = useAppSelector(selectWord);
@@ -16,7 +17,9 @@ const WordImage = () => {
   const dispatch = useAppDispatch();
 
   const {isLoading, isError, data, refetch} = useQuery(['images'], () =>
-    wordContent.enWord.toLowerCase() === 'book' || controlContent.control
+    wordContent.enWord.toLowerCase() === 'book'
+      ? 'https://images.pexels.com/photos/612997/pexels-photo-612997.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'
+      : controlContent.control
       ? exampleContent.image
       : fetchImage(wordContent.enWord),
   );
@@ -48,7 +51,9 @@ const WordImage = () => {
   return (
     <>
       {isLoading && (
-        <View className="w-[40vh] h-[30vh] self-center top-[55vh] justify-center absolute">
+        <View
+          className="w-full self-center justify-center absolute"
+          style={{height: hp('30%'), top: hp('55%')}}>
           <ActivityIndicator
             className="self-center"
             animating={true}
@@ -58,13 +63,16 @@ const WordImage = () => {
       )}
       {isError ? (
         <Image
-          className="w-[40vh] h-[30vh] top-[55vh] rounded-lg self-center absolute"
+          className="w-full rounded-lg self-center absolute"
           source={require('../../assets/Image_not_available.png')}
+          style={{height: hp('30%'), top: hp('55%')}}
         />
       ) : (
-        <View className="border-gray-900 border-4 w-[40vh] h-[30vh] top-[55vh] rounded-lg self-center absolute">
+        <View
+          className="shadow-lg shadow-gray-900 w-full rounded-lg self-center absolute"
+          style={{height: hp('30%'), top: hp('55%')}}>
           <Image
-            className="object-fill h-full w-full"
+            className="object-fill h-full w-full rounded-lg"
             source={{
               uri: img,
             }}

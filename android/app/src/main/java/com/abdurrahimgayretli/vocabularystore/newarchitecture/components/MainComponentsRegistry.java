@@ -1,4 +1,4 @@
-package com.vocabulary.store.newarchitecture.components;
+package com.abdurrahimgayretli.vocabularystore.newarchitecture.components;
 
 import com.facebook.jni.HybridData;
 import com.facebook.proguard.annotations.DoNotStrip;

@@ -3,6 +3,10 @@
 import * as React from 'react';
 import {Modal, Portal} from 'react-native-paper';
 import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen';
+import {
   HStack,
   Input,
   NativeBaseProvider,
@@ -26,23 +30,38 @@ const AddRemindModal = (props: any) => {
           }}
           contentContainerStyle={{
             alignSelf: 'center',
-            width: 300,
+            width: wp('85%'),
             borderRadius: 8,
-            height: 150,
+            height: hp('20%'),
             backgroundColor: 'white',
           }}>
           <HStack space={18} className="self-center">
             <VStack space={4}>
-              <Text className="text-gray-500 text-xs w-[25vh]">Interval</Text>
+              <Text
+                className="text-gray-500"
+                style={{
+                  width: wp('53%'),
+                  fontSize: hp('1.6%'),
+                  lineHeight: hp('2%'),
+                }}>
+                Interval
+              </Text>
               <Input
                 onChangeText={setTime}
                 keyboardType={'numeric'}
-                className="w-[20vh]"
                 placeholder="Enter interval (minute)"
+                style={{width: wp('42%')}}
               />
             </VStack>
             <VStack space={4}>
-              <Text className="text-gray-500 text-xs">Confirm</Text>
+              <Text
+                className="text-gray-500"
+                style={{
+                  fontSize: hp('1.6%'),
+                  lineHeight: hp('2%'),
+                }}>
+                Confirm
+              </Text>
               <IconButton
                 isDisabled={!(time.length >= 1)}
                 onPress={() => {
@@ -51,7 +70,11 @@ const AddRemindModal = (props: any) => {
                     props.addRemind(Number(time), i, String(props.listName));
                   }
                 }}
-                className="h-[6vh] w-[6vh] rounded-lg"
+                className="rounded-lg"
+                style={{
+                  width: wp('13%'),
+                  height: hp('6%'),
+                }}
                 colorScheme="green"
                 icon={<CheckIcon />}
                 variant="solid"

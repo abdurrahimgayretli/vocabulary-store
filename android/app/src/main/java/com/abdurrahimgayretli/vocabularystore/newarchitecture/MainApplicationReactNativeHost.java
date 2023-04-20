@@ -1,4 +1,4 @@
-package com.vocabulary.store.newarchitecture;
+package com.abdurrahimgayretli.vocabularystore.newarchitecture;
 
 import android.app.Application;
 import androidx.annotation.NonNull;
@@ -19,9 +19,9 @@ import com.facebook.react.fabric.CoreComponentsRegistry;
 import com.facebook.react.fabric.FabricJSIModuleProvider;
 import com.facebook.react.fabric.ReactNativeConfig;
 import com.facebook.react.uimanager.ViewManagerRegistry;
-import com.vocabulary.store.BuildConfig;
-import com.vocabulary.store.newarchitecture.components.MainComponentsRegistry;
-import com.vocabulary.store.newarchitecture.modules.MainApplicationTurboModuleManagerDelegate;
+import com.abdurrahimgayretli.vocabularystore.BuildConfig;
+import com.abdurrahimgayretli.vocabularystore.newarchitecture.components.MainComponentsRegistry;
+import com.abdurrahimgayretli.vocabularystore.newarchitecture.modules.MainApplicationTurboModuleManagerDelegate;
 import java.util.ArrayList;
 import java.util.List;
 

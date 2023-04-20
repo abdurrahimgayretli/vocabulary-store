@@ -3,6 +3,10 @@
 import * as React from 'react';
 import {Modal, Portal} from 'react-native-paper';
 import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen';
+import {
   HStack,
   Input,
   NativeBaseProvider,
@@ -22,24 +26,37 @@ const AddListModal = (props: any) => {
           onDismiss={props.notShow}
           contentContainerStyle={{
             alignSelf: 'center',
-            width: 300,
+            width: wp('85%'),
             borderRadius: 8,
-            height: 150,
+            height: hp('20%'),
             backgroundColor: 'white',
           }}>
           <HStack space={18} className="self-center">
             <VStack space={4}>
-              <Text className="text-gray-500 text-xs w-[25vh]">
+              <Text
+                className="text-gray-500"
+                style={{
+                  width: wp('53%'),
+                  fontSize: hp('1.6%'),
+                  lineHeight: hp('2%'),
+                }}>
                 List's Name
               </Text>
               <Input
                 onChangeText={onChangeText}
-                className="w-[20vh]"
                 placeholder="My List"
+                style={{width: wp('42%')}}
               />
             </VStack>
             <VStack space={4}>
-              <Text className="text-gray-500 text-xs">Confirm</Text>
+              <Text
+                className="text-gray-500"
+                style={{
+                  fontSize: hp('1.6%'),
+                  lineHeight: hp('2%'),
+                }}>
+                Confirm
+              </Text>
               <IconButton
                 isDisabled={!(text.length >= 2)}
                 onPress={() => {
@@ -47,6 +64,10 @@ const AddListModal = (props: any) => {
                   props.addList(text);
                 }}
                 className="h-[6vh] w-[6vh] rounded-lg"
+                style={{
+                  width: wp('13%'),
+                  height: hp('6%'),
+                }}
                 colorScheme="green"
                 icon={<CheckIcon />}
                 variant="solid"

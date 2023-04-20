@@ -6,6 +6,10 @@ import {Lists, useQuery, useRealm} from '../models/Lists';
 import {useAppSelector} from '../redux/hooks';
 import {selectWord} from '../redux/state/word';
 import {Words} from '../models/Words';
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen';
 
 const AddListPopUp = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -47,7 +51,7 @@ const AddListPopUp = () => {
               onPress={() => setIsOpen(true)}
               iconColor={'orange'}
               icon={require('../../assets/star.png')}
-              style={{width: 30, height: 30}}
+              style={{width: wp('10%'), height: hp('5%')}}
             />
           );
         }}
@@ -55,8 +59,8 @@ const AddListPopUp = () => {
         onClose={() => setIsOpen(!isOpen)}>
         <Popover.Content
           accessibilityLabel="Select List"
-          className="w-[35vh] left-[2vh] top-[2.5vh]">
-          <Popover.Arrow style={{top: 18}} />
+          style={{width: wp('72%'), top: hp('2.5%'), left: wp('8%')}}>
+          <Popover.Arrow style={{top: hp('3%')}} />
           <Popover.CloseButton />
           <Popover.Header>Select List</Popover.Header>
           <Popover.Body>
@@ -64,7 +68,11 @@ const AddListPopUp = () => {
               {lists.map((val: Lists) => (
                 <Box
                   key={String(val._id)}
-                  className="mb-[1vh] h-[5vh] w-[100%] ">
+                  style={{
+                    width: wp('64%'),
+                    height: hp('5%'),
+                    marginBottom: hp('1%'),
+                  }}>
                   <View
                     onTouchEnd={() => {
                       setIsOpen(false);
@@ -77,7 +85,13 @@ const AddListPopUp = () => {
                       );
                     }}
                     className="h-[100%] self-center w-[90%] bg-slate-300 rounded-lg justify-center">
-                    <Text className="font-serif font-black text-lg absolute left-[2vh]">
+                    <Text
+                      className="font-serif font-black absolute"
+                      style={{
+                        fontSize: hp('2.5%'),
+                        lineHeight: hp('3%'),
+                        left: wp('4%'),
+                      }}>
                       {val.listName}
                     </Text>
                   </View>
