@@ -1,10 +1,14 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import {View, Text} from 'react-native';
+import {View, Text, ToastAndroid} from 'react-native';
 import React, {useEffect} from 'react';
 import {exampleSentences} from '../api';
 import {useQuery} from '@tanstack/react-query';
 import {ScrollView} from 'native-base';
 import Synonyms from './Synonyms';
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen';
 import {useAppDispatch, useAppSelector} from '../redux/hooks';
 import {
   example,
@@ -22,9 +26,14 @@ const ExampleArea = () => {
   const dispatch = useAppDispatch();
 
   const {isLoading, isError, data, refetch} = useQuery(['sentences'], () => {
-    return wordContent.enWord.toLowerCase() === 'book' || controlContent.control
+    return wordContent.enWord.toLowerCase() === 'book'
+      ? 'A book of selected poems'
+      : controlContent.control
       ? exampleContent.sentence
-      : exampleSentences(wordContent.enWord);
+      : exampleSentences(wordContent.enWord).catch(() => {
+          ToastAndroid.show('No Internet connection', ToastAndroid.SHORT);
+          return false;
+        });
   });
   const [wordArray, setWordArray] = React.useState(['']);
 
@@ -45,7 +54,7 @@ const ExampleArea = () => {
   }, [data]);
 
   useEffect(() => {
-    if (exampleContent.sentence !== null) {
+    if (exampleContent.sentence !== null && data !== false) {
       setWordArray(
         exampleContent.sentence
           .toLowerCase()
@@ -62,32 +71,58 @@ const ExampleArea = () => {
   }, []);
 
   return (
-    <View className="top-[10vh] bg-white w-[40vh] h-[20vh] self-center  rounded-lg border-2 border-gray-300 absolute shadow-lg shadow-gray-900">
+    <View
+      className="bg-white w-full self-center rounded-lg border-2 border-gray-300 absolute shadow-lg shadow-gray-900"
+      style={{height: hp('20%'), top: hp('30%')}}>
       <ScrollView>
-        <Text className="text-black font-bold pl-[3vh] pt-[2vh] text-base ">
+        <Text
+          className="text-black font-bold text-base "
+          style={{
+            paddingLeft: wp('6%'),
+            paddingTop: hp('2%'),
+            fontSize: hp('2.1%'),
+            lineHeight: hp('3.1%'),
+          }}>
           Example
         </Text>
         <View className="justify-center">
-          <Text className="pl-[4vh] pr-[4vh] text-black text-base">
+          <Text
+            className="text-black"
+            style={{
+              paddingLeft: wp('8%'),
+              paddingRight: wp('8%'),
+              fontSize: hp('2.1%'),
+              lineHeight: hp('3.1%'),
+            }}>
             {isLoading ? (
               'Loading...'
             ) : isError ? (
               'Sentence Not Found!!!'
+            ) : data === false ? (
+              'No Internet Connection'
             ) : data === null ? (
               'Sentence Not Found!!!'
             ) : (
               <Text>
                 {wordArray[0]}
-                <Text className="font-bold">
-                  {wordContent.enWord.toLowerCase()}
-                </Text>
+                {wordArray[1] !== undefined && (
+                  <Text className="font-bold">
+                    {wordContent.enWord.toLowerCase()}
+                  </Text>
+                )}
                 {wordArray[1]}
               </Text>
             )}
           </Text>
         </View>
         <View>
-          <Text className="text-black font-bold pl-[3vh] text-base ">
+          <Text
+            className="text-black font-bold"
+            style={{
+              paddingLeft: wp('6%'),
+              fontSize: hp('2.1%'),
+              lineHeight: hp('3.1%'),
+            }}>
             Synonyms
           </Text>
           <Synonyms />

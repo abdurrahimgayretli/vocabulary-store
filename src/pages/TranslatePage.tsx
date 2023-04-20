@@ -7,7 +7,7 @@ import WordImage from '../components/WordImage';
 
 export default function TranslatePage() {
   return (
-    <View>
+    <View className="w-[85%] self-center">
       <WordImage />
       <Word />
       <DropDownMenu />

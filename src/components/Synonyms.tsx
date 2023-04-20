@@ -6,6 +6,10 @@ import {Text, View} from 'native-base';
 import {ActivityIndicator, MD2Colors} from 'react-native-paper';
 import {useAppDispatch, useAppSelector} from '../redux/hooks';
 import {control, example, selectWord, setSynonyms} from '../redux/state/word';
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen';
 
 const Synonyms = () => {
   const wordContent = useAppSelector(selectWord);
@@ -17,9 +21,25 @@ const Synonyms = () => {
   const dispatch = useAppDispatch();
 
   const {isLoading, isError, data, refetch} = useQuery(['synonyms'], () =>
-    wordContent.enWord.toLowerCase() === 'book' || controlContent.control
+    wordContent.enWord.toLowerCase() === 'book'
+      ? [
+          {
+            partOfSpeech: 'noun',
+            synonyms: [
+              'tome',
+              'volume',
+              'booklet',
+              'libretto',
+              'account',
+              'record',
+            ],
+          },
+        ]
+      : controlContent.control
       ? exampleContent.synonyms
-      : fetchSynonyms(wordContent.enWord),
+      : fetchSynonyms(wordContent.enWord).catch(() => {
+          return false;
+        }),
   );
 
   useEffect(() => {
@@ -45,9 +65,11 @@ const Synonyms = () => {
   }, [exampleContent.synonyms]);
 
   return (
-    <View className="pl-[4vh] pr-[4vh]">
+    <View style={{paddingLeft: wp('8%'), paddingRight: hp('8%')}}>
       {isLoading && (
-        <View className="w-[40vh] h-[30vh] self-center top-[55vh] justify-center absolute">
+        <View
+          className="self-center justify-center absolute"
+          style={{width: wp('80%'), height: hp('30%'), top: hp('55%')}}>
           <ActivityIndicator
             className="self-center"
             animating={true}
@@ -55,10 +77,17 @@ const Synonyms = () => {
           />
         </View>
       )}
-      <Text className="text-black text-sm">
+      <Text
+        className="text-black"
+        style={{
+          fontSize: hp('1.8%'),
+          lineHeight: hp('2.6%'),
+        }}>
         {isError
           ? 'Synonyms Not Found!!!'
-          : syn?.[0].synonyms[0] === undefined
+          : data === false
+          ? 'No Internet Connection'
+          : syn?.[0]?.synonyms[0] === undefined
           ? 'Synonyms Not Found!!!'
           : syn?.map((val: any, i: number) => (
               <Text className="capitalize font-semibold" key={i}>
