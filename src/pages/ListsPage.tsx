@@ -66,11 +66,15 @@ const ListsPage = ({navigation}: any) => {
   );
 
   const changeIconFun = () => {
-    PushNotification.getScheduledLocalNotifications(notification => {
-      notification.length !== 0
-        ? setNotifyName(notification[0].title)
-        : setNotifyName('');
-    });
+    const interval = setInterval(() => {
+      PushNotification.getScheduledLocalNotifications(notification => {
+        clearInterval(interval);
+        notification.length !== 0
+          ? setNotifyName(notification[0].title)
+          : setNotifyName('');
+      });
+    }, 500);
+    return () => clearInterval(interval);
   };
 
   const showNotificationSchedule = (
@@ -107,8 +111,10 @@ const ListsPage = ({navigation}: any) => {
   };
 
   useEffect(() => {
-    changeIconFun();
-  }, []);
+    if (visibleAddRemind === false) {
+      changeIconFun();
+    }
+  }, [visibleAddRemind]);
 
   return (
     <View className="w-[100%] h-[100%] ">

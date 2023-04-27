@@ -5,11 +5,12 @@ import {fetchSynonyms} from '../api';
 import {Text, View} from 'native-base';
 import {ActivityIndicator, MD2Colors} from 'react-native-paper';
 import {useAppDispatch, useAppSelector} from '../redux/hooks';
-import {control, example, selectWord, setSynonyms} from '../redux/state/word';
+import {control, example, selectWord, setExample} from '../redux/state/word';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
+import {useNetInfo} from '@react-native-community/netinfo';
 
 const Synonyms = () => {
   const wordContent = useAppSelector(selectWord);
@@ -17,44 +18,41 @@ const Synonyms = () => {
   const controlContent = useAppSelector(control);
 
   const [syn, setSyn] = useState(exampleContent.synonyms);
+  const [word, setWord] = useState(wordContent.enWord);
+  const [error, setError] = useState(false);
 
   const dispatch = useAppDispatch();
 
-  const {isLoading, isError, data, refetch} = useQuery(['synonyms'], () =>
-    wordContent.enWord.toLowerCase() === 'book'
+  const netInfo = useNetInfo();
+
+  const {isLoading, data, refetch} = useQuery(['synonyms'], () =>
+    wordContent.enWord === 'Vocabulary Store'
       ? [
           {
             partOfSpeech: 'noun',
-            synonyms: [
-              'tome',
-              'volume',
-              'booklet',
-              'libretto',
-              'account',
-              'record',
-            ],
+            synonyms: ['Vocabulary', 'Store'],
           },
         ]
       : controlContent.control
       ? exampleContent.synonyms
       : fetchSynonyms(wordContent.enWord).catch(() => {
-          return false;
+          setError(true);
         }),
   );
 
   useEffect(() => {
-    refetch();
-  }, [wordContent.enWord]);
+    if (netInfo.isConnected === true) {
+      setError(false);
+      refetch();
+    } else {
+      setError(true);
+    }
+  }, [wordContent.enWord, netInfo.isConnected]);
 
   useEffect(() => {
     if (data !== undefined) {
-      dispatch(
-        setSynonyms({
-          sentence: exampleContent.sentence,
-          synonyms: data,
-          image: exampleContent.image,
-        }),
-      );
+      dispatch(setExample({...exampleContent, synonyms: data}));
+      setWord(wordContent.enWord);
     }
   }, [data]);
 
@@ -63,6 +61,24 @@ const Synonyms = () => {
       setSyn(exampleContent.synonyms);
     }
   }, [exampleContent.synonyms]);
+
+  const text = () => {
+    return syn?.map((val: any, i: number) => (
+      <Text className="capitalize font-semibold" key={i}>
+        {val.synonyms[0] !== undefined && (
+          <>
+            {val.partOfSpeech + ' : '}
+            <Text className="lowercase font-normal">
+              {val.synonyms.map((syns: any) => {
+                return syns + ', ';
+              })}
+              {'\n'}
+            </Text>
+          </>
+        )}
+      </Text>
+    ));
+  };
 
   return (
     <View style={{paddingLeft: wp('8%'), paddingRight: hp('8%')}}>
@@ -83,27 +99,13 @@ const Synonyms = () => {
           fontSize: hp('1.8%'),
           lineHeight: hp('2.6%'),
         }}>
-        {isError
+        {syn?.[0]?.synonyms[0] === undefined
           ? 'Synonyms Not Found!!!'
-          : data === false
-          ? 'No Internet Connection'
-          : syn?.[0]?.synonyms[0] === undefined
+          : netInfo.isConnected === false && word === wordContent.enWord
+          ? text()
+          : error
           ? 'Synonyms Not Found!!!'
-          : syn?.map((val: any, i: number) => (
-              <Text className="capitalize font-semibold" key={i}>
-                {val.synonyms[0] !== undefined && (
-                  <>
-                    {val.partOfSpeech + ' : '}
-                    <Text className="lowercase font-normal">
-                      {val.synonyms.map((syns: any) => {
-                        return syns + ', ';
-                      })}
-                      {'\n'}
-                    </Text>
-                  </>
-                )}
-              </Text>
-            ))}
+          : text()}
       </Text>
     </View>
   );

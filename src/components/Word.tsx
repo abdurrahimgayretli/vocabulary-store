@@ -22,10 +22,16 @@ const Word = () => {
   const [cont, setCont] = useState(true);
   const [pronunciation, setPronunciation] = useState(false);
 
+  const content = {
+    type: 'sound',
+    message:
+      "Language's sound pack not found!!! Would you like to install the language's sound pack?",
+  };
+
   const wordContent = useAppSelector(selectWord);
 
-  const [visibleAddList, setVisibleAddList] = React.useState(false);
-  const hiddenAddList = () => setVisibleAddList(false);
+  const [visibleAllowModal, setVisibleAllowModal] = useState(false);
+  const hiddenAllowModal = () => setVisibleAllowModal(false);
 
   useEffect(() => {
     Voice.onSpeechError = onSpeechError;
@@ -53,7 +59,7 @@ const Word = () => {
       await Voice.start(String(wordContent.targetSpeechLang));
       setStarted(true);
     } else {
-      setVisibleAddList(true);
+      setVisibleAllowModal(true);
     }
   };
   const stopSpeechToText = async () => {
@@ -96,7 +102,7 @@ const Word = () => {
                 Tts.speak(wordContent.transWord);
               })
               .catch(() => {
-                setVisibleAddList(true);
+                setVisibleAllowModal(true);
               });
           }}
           className={`${
@@ -108,12 +114,16 @@ const Word = () => {
           } font-bold self-center text-lg underline decoration-dotted capitalize decoration-cyan-300`}
           style={{fontSize: hp('2.5%'), lineHeight: hp('3%')}}>
           {wordContent.transWord === ''
-            ? (wordContent.transWord = 'Apple')
+            ? (wordContent.transWord = 'Vocabulary Store')
             : wordContent.transWord}
         </Text>
-        {visibleAddList && (
+        {visibleAllowModal && (
           <View>
-            <AllowModal show={visibleAddList} notShow={hiddenAddList} />
+            <AllowModal
+              content={content}
+              show={visibleAllowModal}
+              notShow={hiddenAllowModal}
+            />
           </View>
         )}
         <AddListPopUp />

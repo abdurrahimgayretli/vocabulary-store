@@ -1,25 +1,56 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
-import React, {useState} from 'react';
-import {StyleSheet, View} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {StyleSheet, View, ToastAndroid} from 'react-native';
 import SearchWord from '../components/SearchWord';
-import {IconButton} from 'react-native-paper';
-import {useAppSelector} from '../redux/hooks';
-import {selectWord} from '../redux/state/word';
-import {LANG_TAGS_TYPE} from 'react-native-mlkit-translate-text/MLKitTranslator';
+import {
+  ActivityIndicator,
+  IconButton,
+  MD2Colors,
+  Text,
+} from 'react-native-paper';
+import {useAppDispatch, useAppSelector} from '../redux/hooks';
+import {
+  control,
+  first,
+  selectWord,
+  setControl,
+  setFirst,
+} from '../redux/state/word';
+import MLKitTranslator, {
+  LANG_TAGS_TYPE,
+  downloadModel,
+} from 'react-native-mlkit-translate-text/MLKitTranslator';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import {SelectCountry} from 'react-native-element-dropdown';
+import {useNetInfo} from '@react-native-community/netinfo';
+import AllowModal from './AllowModal';
+
+interface Lang {
+  label: LANG_TAGS_TYPE;
+  value: string;
+  speechLang: string;
+}
 
 const DropDownMenu = () => {
   const [change, setChange] = useState(false);
 
+  const checkFirst = useAppSelector(first);
   const wordContent = useAppSelector(selectWord);
+  const wordControl = useAppSelector(control);
+  const dispatch = useAppDispatch();
 
-  const [source, setSource] = useState<LANG_TAGS_TYPE>(wordContent.source);
-  const [target, setTarget] = useState<LANG_TAGS_TYPE>(wordContent.target);
+  const netInfo = useNetInfo();
+
+  const [source, setSource] = useState<LANG_TAGS_TYPE>(wordControl.source);
+  const [target, setTarget] = useState<LANG_TAGS_TYPE>(wordControl.target);
+  const [downLang, setDownLang] = useState<LANG_TAGS_TYPE>(
+    wordControl.downLang,
+  );
+
   const [soruceSpeechLang, setSourceSpeechLang] = useState(
     wordContent.sourceSpeechLang,
   );
@@ -27,7 +58,20 @@ const DropDownMenu = () => {
     wordContent.targetSpeechLang,
   );
 
-  const lang = [
+  const [content, setContent] = useState({
+    lang: 'TURKISH' as LANG_TAGS_TYPE,
+    type: 'pack',
+    message:
+      "Language pack not found!!!\nWould you like to install the language's pack?",
+  });
+
+  const [visibleLoading, setVisibleLoading] = useState(
+    wordControl.isDownloading,
+  );
+  const [visibleAllowModal, setVisibleAllowModal] = useState(false);
+  const hiddenAllowModal = () => setVisibleAllowModal(false);
+
+  const lang: Lang[] = [
     {label: 'TURKISH', value: 'TURKISH', speechLang: 'tr-TR'},
     {label: 'ENGLISH', value: 'ENGLISH', speechLang: 'en-GB'},
     {label: 'RUSSIAN', value: 'RUSSIAN', speechLang: 'ru-RU'},
@@ -43,6 +87,72 @@ const DropDownMenu = () => {
     {label: 'ARABIC', value: 'ARABIC', speechLang: 'ar-SA'},
   ];
 
+  const isDownload = (lan: Lang, bool: boolean) => {
+    MLKitTranslator.isModelDownloaded(lan.label).then(e => {
+      if (!netInfo.isConnected && netInfo.isConnected !== null && !e) {
+        setContent({...content, lang: lan.label});
+        ToastAndroid.show(
+          'You must open the internet for the translation package to be downloaded.',
+          ToastAndroid.LONG,
+        );
+      } else if (!e && netInfo.isConnected && netInfo.isConnected !== null) {
+        setContent({...content, lang: lan.label});
+        if (visibleLoading) {
+          ToastAndroid.show(
+            'A language pack is currently being downloaded',
+            ToastAndroid.LONG,
+          );
+        } else {
+          setVisibleAllowModal(true);
+        }
+      } else {
+        if (bool) {
+          dispatch(setControl({...wordControl, source: lan.label}));
+          setSource(lan.label);
+          setSourceSpeechLang(lan.speechLang);
+          dispatch(setFirst({...checkFirst, source: true}));
+        } else {
+          dispatch(setControl({...wordControl, target: lan.label}));
+          setTarget(lan.label);
+          setTargetSpeechLang(lan.speechLang);
+          dispatch(setFirst({...checkFirst, target: true}));
+        }
+      }
+    });
+  };
+
+  const download = (language: LANG_TAGS_TYPE) => {
+    downloadModel(language);
+    dispatch(
+      setControl({...wordControl, isDownloading: true, downLang: language}),
+    );
+    setDownLang(language);
+    setVisibleLoading(true);
+  };
+
+  useEffect(() => {
+    if (netInfo.isConnected === false) {
+      setVisibleLoading(false);
+    } else if (wordControl.isDownloading === true) {
+      setVisibleLoading(true);
+    }
+  }, [netInfo.isConnected]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      MLKitTranslator.isModelDownloaded(downLang).then(e => {
+        if (e === true) {
+          dispatch(setControl({...wordControl, isDownloading: false}));
+          setVisibleLoading(false);
+          clearInterval(interval);
+        } else {
+          downloadModel(downLang);
+        }
+      });
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [visibleLoading]);
+
   return (
     <>
       <SearchWord
@@ -51,6 +161,7 @@ const DropDownMenu = () => {
         sourceSpeechLang={!change ? soruceSpeechLang : targetSpeechLang}
         targetSpeechLang={change ? soruceSpeechLang : targetSpeechLang}
         change={change}
+        first={checkFirst}
       />
       <View
         className={'absolute left-0'}
@@ -62,23 +173,35 @@ const DropDownMenu = () => {
             color: 'black',
           }}
           style={styles.dropdown}
-          placeholder="Lang"
-          onChange={(val: any) => {
-            if (!change) {
-              setSource(val.label as LANG_TAGS_TYPE);
-              setSourceSpeechLang(val.speechLang);
-            } else {
-              setTarget(val.label as LANG_TAGS_TYPE);
-              setTargetSpeechLang(val.speechLang);
-            }
+          placeholder="Language"
+          onChange={(val: Lang) => {
+            isDownload(val, !change);
           }}
-          value={!change ? source : target}
+          value={
+            !change
+              ? checkFirst.source
+                ? source
+                : null
+              : checkFirst.target
+              ? target
+              : null
+          }
           data={lang}
           imageField={''}
           labelField={'label'}
           valueField={'value'}
         />
       </View>
+      {visibleAllowModal && (
+        <View>
+          <AllowModal
+            download={download}
+            content={content}
+            show={visibleAllowModal}
+            notShow={hiddenAllowModal}
+          />
+        </View>
+      )}
       <View
         className="absolute self-center bg-white justify-center rounded-lg shadow-lg shadow-gray-900 border-gray-300"
         style={{width: wp('10%'), height: hp('5%'), top: hp('10.5%')}}>
@@ -91,6 +214,7 @@ const DropDownMenu = () => {
           icon={require('../../assets/arrows-right-left.png')}
         />
       </View>
+
       <View
         className={'absolute right-0'}
         style={{width: wp('34%'), height: hp('7%'), top: hp('10%')}}>
@@ -101,23 +225,44 @@ const DropDownMenu = () => {
             color: 'black',
           }}
           style={styles.dropdown}
-          placeholder="Lang"
-          onChange={val => {
-            if (change) {
-              setSource(val.label as LANG_TAGS_TYPE);
-              setSourceSpeechLang(val.speechLang);
-            } else {
-              setTarget(val.label as LANG_TAGS_TYPE);
-              setTargetSpeechLang(val.speechLang);
-            }
+          placeholder="Language"
+          onChange={(val: Lang) => {
+            isDownload(val, change);
           }}
-          value={change ? source : target}
+          value={
+            change
+              ? checkFirst.source
+                ? source
+                : null
+              : checkFirst.target
+              ? target
+              : null
+          }
           data={lang}
           labelField="label"
           valueField="value"
           imageField={''}
         />
       </View>
+      {visibleLoading && (
+        <View
+          className="self-center w-max absolute opacity-70 bg-white rounded-lg "
+          style={{top: hp('75%'), padding: hp('1%')}}>
+          <Text
+            className="text-black font-bold text-base text-center self-center"
+            style={{
+              fontSize: hp('2.1%'),
+              lineHeight: hp('3.1%'),
+            }}>
+            The language pack is downloading!!!
+          </Text>
+          <ActivityIndicator
+            className="self-center"
+            animating={true}
+            color={MD2Colors.black}
+          />
+        </View>
+      )}
     </>
   );
 };

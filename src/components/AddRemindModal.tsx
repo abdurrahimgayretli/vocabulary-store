@@ -1,6 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 /* eslint-disable react-hooks/exhaustive-deps */
-import * as React from 'react';
+import React, {useState} from 'react';
+import {ToastAndroid} from 'react-native';
 import {Modal, Portal} from 'react-native-paper';
 import {
   widthPercentageToDP as wp,
@@ -17,7 +18,7 @@ import {
 } from 'native-base';
 
 const AddRemindModal = (props: any) => {
-  const [time, setTime] = React.useState('');
+  const [time, setTime] = useState('');
 
   return (
     <Portal>
@@ -66,8 +67,15 @@ const AddRemindModal = (props: any) => {
                 isDisabled={!(time.length >= 1)}
                 onPress={() => {
                   props.notShow();
-                  for (var i = 0; i < props.size; i++) {
-                    props.addRemind(Number(time), i, String(props.listName));
+                  if (time.indexOf('-') === -1 && time.indexOf('.') === -1) {
+                    for (var i = 0; i < props.size; i++) {
+                      props.addRemind(Number(time), i, String(props.listName));
+                    }
+                  } else {
+                    ToastAndroid.show(
+                      'Please enter number only',
+                      ToastAndroid.SHORT,
+                    );
                   }
                 }}
                 className="rounded-lg"

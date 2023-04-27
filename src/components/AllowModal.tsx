@@ -8,14 +8,26 @@ import {
 } from 'react-native-responsive-screen';
 import {HStack, NativeBaseProvider, Text, VStack} from 'native-base';
 import Tts from 'react-native-tts';
+import {LANG_TAGS_TYPE} from 'react-native-mlkit-translate-text';
 
-const AllowModal = (props: any) => {
+interface props {
+  content: {
+    lang?: LANG_TAGS_TYPE;
+    type: string;
+    message: string;
+  };
+  show: boolean;
+  notShow: () => void;
+  download?: (language: LANG_TAGS_TYPE) => void;
+}
+
+const AllowModal = ({content, notShow, show, download}: props) => {
   return (
     <Portal>
       <NativeBaseProvider>
         <Modal
-          visible={props.show}
-          onDismiss={props.notShow}
+          visible={show}
+          onDismiss={notShow}
           contentContainerStyle={{
             alignSelf: 'center',
             width: wp('80%'),
@@ -32,8 +44,7 @@ const AllowModal = (props: any) => {
                   fontSize: hp('1.5%'),
                   lineHeight: hp('2%'),
                 }}>
-                Language pack not found!!!{'\n'}Would you like to install the
-                language's sound pack?
+                {content.message}
               </Text>
               <Button
                 className="self-center"
@@ -41,7 +52,12 @@ const AllowModal = (props: any) => {
                 mode="contained"
                 buttonColor="#73be73"
                 onPress={() => {
-                  Tts.requestInstallData();
+                  if (content.type === 'pack') {
+                    download!(content.lang as LANG_TAGS_TYPE);
+                    notShow();
+                  } else if (content.type === 'sound') {
+                    Tts.requestInstallData();
+                  }
                 }}>
                 Yes
               </Button>

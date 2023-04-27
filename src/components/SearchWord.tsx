@@ -11,8 +11,7 @@ import {
 } from 'react-native-responsive-screen';
 import {IconButton} from 'react-native-paper';
 import {useAppDispatch, useAppSelector} from '../redux/hooks';
-import {selectWord, setWordContent} from '../redux/state/word';
-import {useNetInfo} from '@react-native-community/netinfo';
+import {FirstType, selectWord, setWordContent} from '../redux/state/word';
 
 interface props {
   source: LANG_TAGS_TYPE;
@@ -20,6 +19,7 @@ interface props {
   sourceSpeechLang: string;
   targetSpeechLang: string;
   change: boolean;
+  first: FirstType;
 }
 const SearchWord = ({
   source,
@@ -27,6 +27,7 @@ const SearchWord = ({
   sourceSpeechLang,
   targetSpeechLang,
   change,
+  first,
 }: props) => {
   const dispatch = useAppDispatch();
   const wordContent = useAppSelector(selectWord);
@@ -39,28 +40,21 @@ const SearchWord = ({
   const [transWord, setTransWord] = useState(wordContent.enWord);
   const [enWord, setEnWord] = useState(wordContent.enWord);
 
-  const netInfo = useNetInfo();
-
-  const download = (lang: LANG_TAGS_TYPE) => {
-    MLKitTranslator.isModelDownloaded(lang).then(e => {
-      if (!netInfo.isConnected && netInfo.isConnected !== null && !e) {
-        ToastAndroid.show(
-          'You must open the internet for the translation package to be downloaded.',
-          ToastAndroid.LONG,
+  const onPress = async () => {
+    if (first.target === false || first.source === false) {
+      ToastAndroid.show('Please select language', ToastAndroid.SHORT);
+    } else if (text !== '') {
+      Keyboard.dismiss();
+      setTransWord(
+        String(await MLKitTranslator.translateText(text, source, target)),
+      );
+      String(MLKitTranslator.translateText(text, source, 'ENGLISH')) !==
+        enWord &&
+        setEnWord(
+          String(await MLKitTranslator.translateText(text, source, 'ENGLISH')),
         );
-      } else if (!e && netInfo.isConnected && netInfo.isConnected !== null) {
-        MLKitTranslator.downloadModel(lang);
-        ToastAndroid.show('Installing translate package', ToastAndroid.SHORT);
-      }
-    });
+    }
   };
-
-  useEffect(() => {
-    download(target);
-  }, [netInfo.isConnected, target]);
-  useEffect(() => {
-    download(source);
-  }, [source, netInfo.isConnected]);
 
   useEffect(() => {
     setWord(text);
@@ -137,37 +131,7 @@ const SearchWord = ({
         <IconButton
           style={{alignSelf: 'center'}}
           iconColor="black"
-          onPress={async () => {
-            if (text !== '') {
-              Keyboard.dismiss();
-              setTransWord(
-                String(
-                  await MLKitTranslator.translateText(
-                    text,
-                    source,
-                    target,
-                  ).catch(() => {
-                    ToastAndroid.show(
-                      'Language pack not found',
-                      ToastAndroid.SHORT,
-                    );
-                  }),
-                ),
-              );
-              String(MLKitTranslator.translateText(text, source, 'ENGLISH')) !==
-              enWord
-                ? setEnWord(
-                    String(
-                      await MLKitTranslator.translateText(
-                        text,
-                        source,
-                        'ENGLISH',
-                      ),
-                    ),
-                  )
-                : '';
-            }
-          }}
+          onPress={onPress}
           icon={require('../../assets/enter.png')}
         />
       </View>

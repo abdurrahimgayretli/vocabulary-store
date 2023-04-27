@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import {View, Text, ToastAndroid} from 'react-native';
-import React, {useEffect} from 'react';
+import {View, Text} from 'react-native';
+import React, {useEffect, useState} from 'react';
 import {exampleSentences} from '../api';
 import {useQuery} from '@tanstack/react-query';
 import {ScrollView} from 'native-base';
@@ -13,48 +13,68 @@ import {useAppDispatch, useAppSelector} from '../redux/hooks';
 import {
   example,
   selectWord,
-  setSentence,
   control,
   setControl,
+  setExample,
 } from '../redux/state/word';
+import {useNetInfo} from '@react-native-community/netinfo';
 
 const ExampleArea = () => {
   const wordContent = useAppSelector(selectWord);
   const exampleContent = useAppSelector(example);
   const controlContent = useAppSelector(control);
 
-  const dispatch = useAppDispatch();
+  const [word, setWord] = useState(wordContent.enWord);
+  const [error, setError] = useState(false);
+  const [sentence, setSentence] = useState(exampleContent.sentence);
+  const [wordArray, setWordArray] = useState(
+    sentence.toLowerCase().split(wordContent.enWord.toLowerCase()),
+  );
 
-  const {isLoading, isError, data, refetch} = useQuery(['sentences'], () => {
-    return wordContent.enWord.toLowerCase() === 'book'
-      ? 'A book of selected poems'
+  const dispatch = useAppDispatch();
+  const netInfo = useNetInfo();
+
+  const {isLoading, data, refetch} = useQuery(['sentences'], () => {
+    return wordContent.enWord === 'Vocabulary Store'
+      ? 'Welcome to Vocabulary Store'
       : controlContent.control
       ? exampleContent.sentence
       : exampleSentences(wordContent.enWord).catch(() => {
-          ToastAndroid.show('No Internet connection', ToastAndroid.SHORT);
-          return false;
+          setError(true);
         });
   });
-  const [wordArray, setWordArray] = React.useState(['']);
+
+  const text = () => {
+    return (
+      <Text>
+        {wordArray[0]}
+        {wordArray[1] !== undefined && (
+          <Text className="font-bold">{wordContent.enWord.toLowerCase()}</Text>
+        )}
+        {wordArray[1]}
+      </Text>
+    );
+  };
 
   useEffect(() => {
-    refetch();
-  }, [wordContent.enWord]);
+    if (netInfo.isConnected === true) {
+      setError(false);
+      refetch();
+    } else {
+      setError(true);
+    }
+  }, [wordContent.enWord, netInfo.isConnected]);
 
   useEffect(() => {
     if (data !== undefined) {
-      dispatch(
-        setSentence({
-          sentence: data,
-          synonyms: exampleContent.synonyms,
-          image: exampleContent.image,
-        }),
-      );
+      dispatch(setExample({...exampleContent, sentence: data}));
+      setWord(wordContent.enWord);
     }
   }, [data]);
 
   useEffect(() => {
-    if (exampleContent.sentence !== null && data !== false) {
+    if (exampleContent.sentence !== null) {
+      setSentence(exampleContent.sentence);
       setWordArray(
         exampleContent.sentence
           .toLowerCase()
@@ -64,9 +84,9 @@ const ExampleArea = () => {
   }, [exampleContent.sentence]);
 
   useEffect(() => {
-    dispatch(setControl({control: false}));
+    dispatch(setControl({...controlContent, control: false}));
     return () => {
-      dispatch(setControl({control: true}));
+      dispatch(setControl({...controlContent, control: true}));
     };
   }, []);
 
@@ -94,25 +114,15 @@ const ExampleArea = () => {
               fontSize: hp('2.1%'),
               lineHeight: hp('3.1%'),
             }}>
-            {isLoading ? (
-              'Loading...'
-            ) : isError ? (
-              'Sentence Not Found!!!'
-            ) : data === false ? (
-              'No Internet Connection'
-            ) : data === null ? (
-              'Sentence Not Found!!!'
-            ) : (
-              <Text>
-                {wordArray[0]}
-                {wordArray[1] !== undefined && (
-                  <Text className="font-bold">
-                    {wordContent.enWord.toLowerCase()}
-                  </Text>
-                )}
-                {wordArray[1]}
-              </Text>
-            )}
+            {isLoading
+              ? 'Loading...'
+              : data === null
+              ? 'Sentence Not Found!!!'
+              : netInfo.isConnected === false && word === wordContent.enWord
+              ? text()
+              : error
+              ? 'Sentence Not Found!!!'
+              : text()}
           </Text>
         </View>
         <View>

@@ -1,12 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
 import {useQuery} from '@tanstack/react-query';
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Image, View} from 'react-native';
 import {ActivityIndicator, MD2Colors} from 'react-native-paper';
 import {fetchImage} from '../api';
 import {useAppDispatch, useAppSelector} from '../redux/hooks';
-import {control, example, selectWord, setImage} from '../redux/state/word';
+import {control, example, selectWord, setExample} from '../redux/state/word';
 import {heightPercentageToDP as hp} from 'react-native-responsive-screen';
 
 const WordImage = () => {
@@ -17,14 +17,14 @@ const WordImage = () => {
   const dispatch = useAppDispatch();
 
   const {isLoading, isError, data, refetch} = useQuery(['images'], () =>
-    wordContent.enWord.toLowerCase() === 'book'
-      ? 'https://images.pexels.com/photos/612997/pexels-photo-612997.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'
+    wordContent.enWord === 'Vocabulary Store'
+      ? 'https://images.pexels.com/photos/3643925/pexels-photo-3643925.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'
       : controlContent.control
       ? exampleContent.image
       : fetchImage(wordContent.enWord),
   );
 
-  const [img, setImg] = React.useState(exampleContent.image);
+  const [img, setImg] = useState(exampleContent.image);
 
   useEffect(() => {
     refetch();
@@ -32,13 +32,7 @@ const WordImage = () => {
 
   useEffect(() => {
     if (data !== undefined) {
-      dispatch(
-        setImage({
-          sentence: exampleContent.sentence,
-          synonyms: exampleContent.synonyms,
-          image: data,
-        }),
-      );
+      dispatch(setExample({...exampleContent, image: data}));
     }
   }, [data]);
 
