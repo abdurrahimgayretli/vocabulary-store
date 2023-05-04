@@ -11,11 +11,13 @@ import {
 } from 'react-native-paper';
 import {useAppDispatch, useAppSelector} from '../redux/hooks';
 import {
-  control,
+  change,
   first,
+  select,
   selectWord,
-  setControl,
+  setChange,
   setFirst,
+  setSelect,
 } from '../redux/state/word';
 import MLKitTranslator, {
   LANG_TAGS_TYPE,
@@ -36,20 +38,18 @@ interface Lang {
 }
 
 const DropDownMenu = () => {
-  const [change, setChange] = useState(false);
-
   const checkFirst = useAppSelector(first);
   const wordContent = useAppSelector(selectWord);
-  const wordControl = useAppSelector(control);
+  const wordSelect = useAppSelector(select);
+  const wordChange = useAppSelector(change);
   const dispatch = useAppDispatch();
 
   const netInfo = useNetInfo();
 
-  const [source, setSource] = useState<LANG_TAGS_TYPE>(wordControl.source);
-  const [target, setTarget] = useState<LANG_TAGS_TYPE>(wordControl.target);
-  const [downLang, setDownLang] = useState<LANG_TAGS_TYPE>(
-    wordControl.downLang,
-  );
+  const [source, setSource] = useState<LANG_TAGS_TYPE>(wordSelect.source);
+  const [target, setTarget] = useState<LANG_TAGS_TYPE>(wordSelect.target);
+  const [downLang, setDownLang] = useState<LANG_TAGS_TYPE>(wordSelect.downLang);
+  const [changer, setChanger] = useState(wordChange.change);
 
   const [soruceSpeechLang, setSourceSpeechLang] = useState(
     wordContent.sourceSpeechLang,
@@ -66,7 +66,7 @@ const DropDownMenu = () => {
   });
 
   const [visibleLoading, setVisibleLoading] = useState(
-    wordControl.isDownloading,
+    wordSelect.isDownloading,
   );
   const [visibleAllowModal, setVisibleAllowModal] = useState(false);
   const hiddenAllowModal = () => setVisibleAllowModal(false);
@@ -107,12 +107,12 @@ const DropDownMenu = () => {
         }
       } else {
         if (bool) {
-          dispatch(setControl({...wordControl, source: lan.label}));
+          dispatch(setSelect({...wordSelect, source: lan.label}));
           setSource(lan.label);
           setSourceSpeechLang(lan.speechLang);
           dispatch(setFirst({...checkFirst, source: true}));
         } else {
-          dispatch(setControl({...wordControl, target: lan.label}));
+          dispatch(setSelect({...wordSelect, target: lan.label}));
           setTarget(lan.label);
           setTargetSpeechLang(lan.speechLang);
           dispatch(setFirst({...checkFirst, target: true}));
@@ -124,7 +124,7 @@ const DropDownMenu = () => {
   const download = (language: LANG_TAGS_TYPE) => {
     downloadModel(language);
     dispatch(
-      setControl({...wordControl, isDownloading: true, downLang: language}),
+      setSelect({...wordSelect, isDownloading: true, downLang: language}),
     );
     setDownLang(language);
     setVisibleLoading(true);
@@ -133,7 +133,7 @@ const DropDownMenu = () => {
   useEffect(() => {
     if (netInfo.isConnected === false) {
       setVisibleLoading(false);
-    } else if (wordControl.isDownloading === true) {
+    } else if (wordSelect.isDownloading === true) {
       setVisibleLoading(true);
     }
   }, [netInfo.isConnected]);
@@ -142,25 +142,25 @@ const DropDownMenu = () => {
     const interval = setInterval(() => {
       MLKitTranslator.isModelDownloaded(downLang).then(e => {
         if (e === true) {
-          dispatch(setControl({...wordControl, isDownloading: false}));
+          dispatch(setSelect({...wordSelect, isDownloading: false}));
           setVisibleLoading(false);
           clearInterval(interval);
         } else {
           downloadModel(downLang);
         }
       });
-    }, 5000);
+    }, 2500);
     return () => clearInterval(interval);
   }, [visibleLoading]);
 
   return (
     <>
       <SearchWord
-        source={!change ? source : target}
-        target={change ? source : target}
-        sourceSpeechLang={!change ? soruceSpeechLang : targetSpeechLang}
-        targetSpeechLang={change ? soruceSpeechLang : targetSpeechLang}
-        change={change}
+        source={!changer ? source : target}
+        target={changer ? source : target}
+        sourceSpeechLang={!changer ? soruceSpeechLang : targetSpeechLang}
+        targetSpeechLang={changer ? soruceSpeechLang : targetSpeechLang}
+        change={changer}
         first={checkFirst}
       />
       <View
@@ -175,10 +175,10 @@ const DropDownMenu = () => {
           style={styles.dropdown}
           placeholder="Language"
           onChange={(val: Lang) => {
-            isDownload(val, !change);
+            isDownload(val, !changer);
           }}
           value={
-            !change
+            !changer
               ? checkFirst.source
                 ? source
                 : null
@@ -208,7 +208,13 @@ const DropDownMenu = () => {
         <IconButton
           iconColor="black"
           onPress={() => {
-            change ? setChange(false) : setChange(true);
+            if (changer) {
+              setChanger(false);
+              dispatch(setChange({change: false}));
+            } else {
+              setChanger(true);
+              dispatch(setChange({change: true}));
+            }
           }}
           style={{alignSelf: 'center'}}
           icon={require('../../assets/arrows-right-left.png')}
@@ -227,10 +233,10 @@ const DropDownMenu = () => {
           style={styles.dropdown}
           placeholder="Language"
           onChange={(val: Lang) => {
-            isDownload(val, change);
+            isDownload(val, changer);
           }}
           value={
-            change
+            changer
               ? checkFirst.source
                 ? source
                 : null

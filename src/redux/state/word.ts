@@ -18,12 +18,18 @@ export interface ExampleType {
 }
 export interface ControlType {
   control: boolean;
+}
+
+export interface SelectType {
   source: LANG_TAGS_TYPE;
   target: LANG_TAGS_TYPE;
   isDownloading: boolean;
   downLang: LANG_TAGS_TYPE;
 }
 
+export interface ChangeType {
+  change: boolean;
+}
 export interface FirstType {
   source: boolean;
   target: boolean;
@@ -33,6 +39,8 @@ export interface WordState {
   wordExample: ExampleType;
   wordControl: ControlType;
   wordFirst: FirstType;
+  wordSelect: SelectType;
+  wordChange: ChangeType;
 }
 
 const initialState: WordState = {
@@ -56,12 +64,15 @@ const initialState: WordState = {
       },
     ],
   },
-  wordControl: {
-    control: false,
+  wordSelect: {
     source: 'ENGLISH',
     target: 'ENGLISH',
     isDownloading: false,
     downLang: 'ENGLISH',
+  },
+  wordChange: {change: false},
+  wordControl: {
+    control: false,
   },
   wordFirst: {source: false, target: false},
 };
@@ -82,6 +93,12 @@ const wordSlice = createSlice({
     setFirst: (state, action: PayloadAction<FirstType>) => {
       state.wordFirst = action.payload;
     },
+    setSelect: (state, action: PayloadAction<SelectType>) => {
+      state.wordSelect = action.payload;
+    },
+    setChange: (state, action: PayloadAction<ChangeType>) => {
+      state.wordChange = action.payload;
+    },
   },
 });
 
@@ -89,10 +106,14 @@ export const {setWordContent} = wordSlice.actions;
 export const {setExample} = wordSlice.actions;
 export const {setControl} = wordSlice.actions;
 export const {setFirst} = wordSlice.actions;
+export const {setSelect} = wordSlice.actions;
+export const {setChange} = wordSlice.actions;
 
 export const selectWord = (state: RootState) => state.word.wordContent;
 export const example = (state: RootState) => state.word.wordExample;
 export const control = (state: RootState) => state.word.wordControl;
 export const first = (state: RootState) => state.word.wordFirst;
+export const select = (state: RootState) => state.word.wordSelect;
+export const change = (state: RootState) => state.word.wordChange;
 
 export default wordSlice.reducer;

@@ -18,8 +18,8 @@ const Synonyms = () => {
   const controlContent = useAppSelector(control);
 
   const [syn, setSyn] = useState(exampleContent.synonyms);
-  const [word, setWord] = useState(wordContent.enWord);
-  const [error, setError] = useState(false);
+  const [word, setWord] = useState('');
+  const [error, setError] = useState(true);
 
   const dispatch = useAppDispatch();
 
@@ -50,7 +50,7 @@ const Synonyms = () => {
   }, [wordContent.enWord, netInfo.isConnected]);
 
   useEffect(() => {
-    if (data !== undefined) {
+    if (data !== undefined && !error) {
       dispatch(setExample({...exampleContent, synonyms: data}));
       setWord(wordContent.enWord);
     }
@@ -103,6 +103,8 @@ const Synonyms = () => {
           ? 'Synonyms Not Found!!!'
           : netInfo.isConnected === false && word === wordContent.enWord
           ? text()
+          : netInfo.isConnected === false
+          ? 'No Internet Connection!!!'
           : error
           ? 'Synonyms Not Found!!!'
           : text()}

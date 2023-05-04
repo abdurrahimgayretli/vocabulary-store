@@ -24,11 +24,11 @@ const ExampleArea = () => {
   const exampleContent = useAppSelector(example);
   const controlContent = useAppSelector(control);
 
-  const [word, setWord] = useState(wordContent.enWord);
-  const [error, setError] = useState(false);
+  const [word, setWord] = useState('');
+  const [error, setError] = useState(true);
   const [sentence, setSentence] = useState(exampleContent.sentence);
-  const [wordArray, setWordArray] = useState(
-    sentence.toLowerCase().split(wordContent.enWord.toLowerCase()),
+  const [wordArray, setWordArray] = useState<String[]>(
+    sentence?.toLowerCase().split(wordContent.enWord.toLowerCase()),
   );
 
   const dispatch = useAppDispatch();
@@ -45,15 +45,19 @@ const ExampleArea = () => {
   });
 
   const text = () => {
-    return (
-      <Text>
-        {wordArray[0]}
-        {wordArray[1] !== undefined && (
-          <Text className="font-bold">{wordContent.enWord.toLowerCase()}</Text>
-        )}
-        {wordArray[1]}
-      </Text>
-    );
+    if (wordArray !== undefined) {
+      return (
+        <Text>
+          {wordArray[0]}
+          {wordArray[1] !== undefined && (
+            <Text className="font-bold">
+              {wordContent.enWord.toLowerCase()}
+            </Text>
+          )}
+          {wordArray[1]}
+        </Text>
+      );
+    }
   };
 
   useEffect(() => {
@@ -66,7 +70,7 @@ const ExampleArea = () => {
   }, [wordContent.enWord, netInfo.isConnected]);
 
   useEffect(() => {
-    if (data !== undefined) {
+    if (data !== undefined && !error) {
       dispatch(setExample({...exampleContent, sentence: data}));
       setWord(wordContent.enWord);
     }
@@ -120,6 +124,8 @@ const ExampleArea = () => {
               ? 'Sentence Not Found!!!'
               : netInfo.isConnected === false && word === wordContent.enWord
               ? text()
+              : netInfo.isConnected === false
+              ? 'No Internet Connection!!!'
               : error
               ? 'Sentence Not Found!!!'
               : text()}
