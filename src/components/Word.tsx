@@ -13,7 +13,7 @@ import {
 
 import AddListPopUp from './AddListPopUp';
 import {useAppSelector} from '../redux/hooks';
-import {selectWord} from '../redux/state/word';
+import {wordContent} from '../redux/state/word';
 import AllowModal from './AllowModal';
 
 const Word = () => {
@@ -28,7 +28,7 @@ const Word = () => {
       "Language's sound pack not found!!! Would you like to install the language's sound pack?",
   };
 
-  const wordContent = useAppSelector(selectWord);
+  const wordContents = useAppSelector(wordContent);
 
   const [visibleAllowModal, setVisibleAllowModal] = useState(false);
   const hiddenAllowModal = () => setVisibleAllowModal(false);
@@ -49,14 +49,14 @@ const Word = () => {
     setPronunciation(false);
     setResults(['']);
     setCont(true);
-    Tts.setDefaultLanguage(String(wordContent.targetSpeechLang)).catch(() => {
+    Tts.setDefaultLanguage(String(wordContents.targetSpeechLang)).catch(() => {
       setCont(false);
     });
-  }, [wordContent.transWord]);
+  }, [wordContents.transWord]);
 
   const startSpeechToText = async () => {
     if (cont) {
-      await Voice.start(String(wordContent.targetSpeechLang));
+      await Voice.start(String(wordContents.targetSpeechLang));
       setStarted(true);
     } else {
       setVisibleAllowModal(true);
@@ -82,7 +82,7 @@ const Word = () => {
     String(results[0])
       .split(' ')
       .forEach(value => {
-        wordContent.transWord.split(' ').forEach(elem => {
+        wordContents.transWord.split(' ').forEach(elem => {
           elem.toLocaleLowerCase() === value.toLocaleLowerCase()
             ? setPronunciation(true)
             : setPronunciation(false);
@@ -97,9 +97,9 @@ const Word = () => {
         style={{height: hp('5%'), top: hp('2%')}}>
         <Text
           onPress={() => {
-            Tts.setDefaultLanguage(String(wordContent.targetSpeechLang))
+            Tts.setDefaultLanguage(String(wordContents.targetSpeechLang))
               .then(() => {
-                Tts.speak(wordContent.transWord);
+                Tts.speak(wordContents.transWord);
               })
               .catch(() => {
                 setVisibleAllowModal(true);
@@ -113,9 +113,9 @@ const Word = () => {
               : 'text-black'
           } font-bold self-center text-lg underline decoration-dotted capitalize decoration-cyan-300`}
           style={{fontSize: hp('2.5%'), lineHeight: hp('3%')}}>
-          {wordContent.transWord === ''
-            ? (wordContent.transWord = 'Vocabulary Store')
-            : wordContent.transWord}
+          {wordContents.transWord === ''
+            ? (wordContents.transWord = 'Vocabulary Store')
+            : wordContents.transWord}
         </Text>
         {visibleAllowModal && (
           <View>

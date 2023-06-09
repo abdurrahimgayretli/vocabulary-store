@@ -5,7 +5,7 @@ import {fetchSynonyms} from '../api';
 import {Text, View} from 'native-base';
 import {ActivityIndicator, MD2Colors} from 'react-native-paper';
 import {useAppDispatch, useAppSelector} from '../redux/hooks';
-import {control, example, selectWord, setExample} from '../redux/state/word';
+import {control, example, wordContent, setExample} from '../redux/state/word';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -13,7 +13,7 @@ import {
 import {useNetInfo} from '@react-native-community/netinfo';
 
 const Synonyms = () => {
-  const wordContent = useAppSelector(selectWord);
+  const wordContents = useAppSelector(wordContent);
   const exampleContent = useAppSelector(example);
   const controlContent = useAppSelector(control);
 
@@ -26,7 +26,7 @@ const Synonyms = () => {
   const netInfo = useNetInfo();
 
   const {isLoading, data, refetch} = useQuery(['synonyms'], () =>
-    wordContent.enWord === 'Vocabulary Store'
+    wordContents.enWord === 'Vocabulary Store'
       ? [
           {
             partOfSpeech: 'noun',
@@ -35,7 +35,7 @@ const Synonyms = () => {
         ]
       : controlContent.control
       ? exampleContent.synonyms
-      : fetchSynonyms(wordContent.enWord).catch(() => {
+      : fetchSynonyms(wordContents.enWord).catch(() => {
           setError(true);
         }),
   );
@@ -47,12 +47,12 @@ const Synonyms = () => {
     } else {
       setError(true);
     }
-  }, [wordContent.enWord, netInfo.isConnected]);
+  }, [wordContents.enWord, netInfo.isConnected]);
 
   useEffect(() => {
     if (data !== undefined && !error) {
       dispatch(setExample({...exampleContent, synonyms: data}));
-      setWord(wordContent.enWord);
+      setWord(wordContents.enWord);
     }
   }, [data]);
 
@@ -101,7 +101,7 @@ const Synonyms = () => {
         }}>
         {syn?.[0]?.synonyms[0] === undefined
           ? 'Synonyms Not Found!!!'
-          : netInfo.isConnected === false && word === wordContent.enWord
+          : netInfo.isConnected === false && word === wordContents.enWord
           ? text()
           : netInfo.isConnected === false
           ? 'No Internet Connection!!!'

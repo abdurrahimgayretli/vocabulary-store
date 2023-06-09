@@ -6,29 +6,29 @@ import {Image, View} from 'react-native';
 import {ActivityIndicator, MD2Colors} from 'react-native-paper';
 import {fetchImage} from '../api';
 import {useAppDispatch, useAppSelector} from '../redux/hooks';
-import {control, example, selectWord, setExample} from '../redux/state/word';
+import {control, example, wordContent, setExample} from '../redux/state/word';
 import {heightPercentageToDP as hp} from 'react-native-responsive-screen';
 
 const WordImage = () => {
-  const wordContent = useAppSelector(selectWord);
+  const wordContents = useAppSelector(wordContent);
   const exampleContent = useAppSelector(example);
   const controlContent = useAppSelector(control);
 
   const dispatch = useAppDispatch();
 
   const {isLoading, isError, data, refetch} = useQuery(['images'], () =>
-    wordContent.enWord === 'Vocabulary Store'
+    wordContents.enWord === 'Vocabulary Store'
       ? 'https://images.pexels.com/photos/3643925/pexels-photo-3643925.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'
       : controlContent.control
       ? exampleContent.image
-      : fetchImage(wordContent.enWord),
+      : fetchImage(wordContents.enWord),
   );
 
   const [img, setImg] = useState(exampleContent.image);
 
   useEffect(() => {
     refetch();
-  }, [wordContent.enWord]);
+  }, [wordContents.enWord]);
 
   useEffect(() => {
     if (data !== undefined) {

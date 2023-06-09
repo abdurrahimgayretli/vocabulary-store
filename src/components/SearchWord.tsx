@@ -11,48 +11,70 @@ import {
 } from 'react-native-responsive-screen';
 import {IconButton} from 'react-native-paper';
 import {useAppDispatch, useAppSelector} from '../redux/hooks';
-import {FirstType, selectWord, setWordContent} from '../redux/state/word';
-
-interface props {
-  source: LANG_TAGS_TYPE;
-  target: LANG_TAGS_TYPE;
-  sourceSpeechLang: string;
-  targetSpeechLang: string;
-  change: boolean;
-  first: FirstType;
-}
-const SearchWord = ({
-  source,
-  target,
-  sourceSpeechLang,
-  targetSpeechLang,
+import {
   change,
   first,
-}: props) => {
-  const dispatch = useAppDispatch();
-  const wordContent = useAppSelector(selectWord);
+  select,
+  wordContent,
+  setWordContent,
+} from '../redux/state/word';
 
-  const [text, setText] = useState(wordContent.word);
-  const [temp, setTemp] = useState(wordContent.word);
+const SearchWord = () => {
+  const dispatch = useAppDispatch();
+  const wordContents = useAppSelector(wordContent);
+  const selectedWord = useAppSelector(select);
+  const firstControl = useAppSelector(first);
+  const changeControl = useAppSelector(change);
+
+  const [text, setText] = useState(wordContents.word);
+  const [temp, setTemp] = useState(wordContents.word);
   const [onChange, setOnChange] = useState(true);
   const [control, setControl] = useState(false);
-  const [word, setWord] = useState(wordContent.word);
-  const [transWord, setTransWord] = useState(wordContent.enWord);
-  const [enWord, setEnWord] = useState(wordContent.enWord);
+  const [word, setWord] = useState(wordContents.word);
+  const [transWord, setTransWord] = useState(wordContents.enWord);
+  const [enWord, setEnWord] = useState(wordContents.enWord);
+
+  const [source, setSource] = useState<LANG_TAGS_TYPE>(wordContents.source);
+  const [sourceSpeechLang, setSourceSpeechLang] = useState(
+    wordContents.sourceSpeechLang,
+  );
+  const [target, setTarget] = useState<LANG_TAGS_TYPE>(wordContents.target);
+  const [targetSpeechLang, setTargetSpeechLang] = useState(
+    wordContents.targetSpeechLang,
+  );
+
+  const [search, setSearch] = useState(false);
+
+  const [didMount, setDidMount] = useState(false);
 
   const onPress = async () => {
-    if (first.target === false || first.source === false) {
+    if (firstControl.target === false || firstControl.source === false) {
       ToastAndroid.show('Please select language', ToastAndroid.SHORT);
     } else if (text !== '') {
+      setDidMount(true);
       Keyboard.dismiss();
       setTransWord(
-        String(await MLKitTranslator.translateText(text, source, target)),
+        String(
+          await MLKitTranslator.translateText(
+            text,
+            selectedWord.source,
+            selectedWord.target,
+          ),
+        ),
       );
-      String(MLKitTranslator.translateText(text, source, 'ENGLISH')) !==
-        enWord &&
+      String(
+        MLKitTranslator.translateText(text, selectedWord.source, 'ENGLISH'),
+      ) !== enWord &&
         setEnWord(
-          String(await MLKitTranslator.translateText(text, source, 'ENGLISH')),
+          String(
+            await MLKitTranslator.translateText(
+              text,
+              selectedWord.source,
+              'ENGLISH',
+            ),
+          ),
         );
+      setSearch(true);
     }
   };
 
@@ -61,38 +83,61 @@ const SearchWord = ({
   }, [enWord]);
 
   useEffect(() => {
-    if (text !== '') {
+    if (text !== '' && didMount) {
       dispatch(
         setWordContent({
           word: word,
           transWord: transWord,
           enWord: enWord,
-          source: source,
-          sourceSpeechLang: sourceSpeechLang,
-          target: target,
-          targetSpeechLang: targetSpeechLang,
+          source: selectedWord.source,
+          sourceSpeechLang: selectedWord.sourceSpeechLang,
+          target: selectedWord.target,
+          targetSpeechLang: selectedWord.targetSpeechLang,
         }),
       );
+      setSource(selectedWord.source);
+      setSourceSpeechLang(selectedWord.sourceSpeechLang);
+      setTarget(selectedWord.target);
+      setTargetSpeechLang(selectedWord.targetSpeechLang);
       setTemp(text);
       setOnChange(true);
       setControl(true);
     }
-  }, [word, transWord]);
+  }, [search]);
 
   useEffect(() => {
     if (control && temp === text && onChange) {
-      setText(wordContent.transWord);
-      setWord(wordContent.transWord);
-      setTransWord(wordContent.word);
-      setTemp(wordContent.transWord);
+      setDidMount(true);
+      setText(wordContents.transWord);
+      setWord(wordContents.transWord);
+      setTransWord(wordContents.word);
+      setTemp(wordContents.transWord);
+      dispatch(
+        setWordContent({
+          word: wordContents.transWord,
+          transWord: wordContents.word,
+          enWord: enWord,
+          source: target,
+          sourceSpeechLang: targetSpeechLang,
+          target: source,
+          targetSpeechLang: sourceSpeechLang,
+        }),
+      );
     } else if (temp === text && onChange) {
-      setText(wordContent.word);
-      setWord(wordContent.word);
-      setTransWord(wordContent.transWord);
-      setTemp(wordContent.word);
+      setText(wordContents.word);
+      setWord(wordContents.word);
+      setTransWord(wordContents.transWord);
+      setTemp(wordContents.word);
       setControl(true);
     }
-  }, [change]);
+  }, [changeControl]);
+
+  useEffect(() => {
+    setSource(wordContents.source);
+    setSourceSpeechLang(wordContents.sourceSpeechLang);
+    setTarget(wordContents.target);
+    setTargetSpeechLang(wordContents.targetSpeechLang);
+  }, [wordContents]);
 
   useEffect(() => {
     if (temp !== text) {

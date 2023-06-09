@@ -22,7 +22,12 @@ export interface ControlType {
 
 export interface SelectType {
   source: LANG_TAGS_TYPE;
+  sourceSpeechLang: string;
   target: LANG_TAGS_TYPE;
+  targetSpeechLang: string;
+}
+
+export interface DownloadType {
   isDownloading: boolean;
   downLang: LANG_TAGS_TYPE;
 }
@@ -41,6 +46,7 @@ export interface WordState {
   wordFirst: FirstType;
   wordSelect: SelectType;
   wordChange: ChangeType;
+  isDownloading: DownloadType;
 }
 
 const initialState: WordState = {
@@ -66,10 +72,11 @@ const initialState: WordState = {
   },
   wordSelect: {
     source: 'ENGLISH',
+    sourceSpeechLang: 'en-GB',
     target: 'ENGLISH',
-    isDownloading: false,
-    downLang: 'ENGLISH',
+    targetSpeechLang: 'en-GB',
   },
+  isDownloading: {isDownloading: false, downLang: 'ENGLISH'},
   wordChange: {change: false},
   wordControl: {
     control: false,
@@ -99,6 +106,9 @@ const wordSlice = createSlice({
     setChange: (state, action: PayloadAction<ChangeType>) => {
       state.wordChange = action.payload;
     },
+    setDownloading: (state, action: PayloadAction<DownloadType>) => {
+      state.isDownloading = action.payload;
+    },
   },
 });
 
@@ -108,12 +118,14 @@ export const {setControl} = wordSlice.actions;
 export const {setFirst} = wordSlice.actions;
 export const {setSelect} = wordSlice.actions;
 export const {setChange} = wordSlice.actions;
+export const {setDownloading} = wordSlice.actions;
 
-export const selectWord = (state: RootState) => state.word.wordContent;
+export const wordContent = (state: RootState) => state.word.wordContent;
 export const example = (state: RootState) => state.word.wordExample;
 export const control = (state: RootState) => state.word.wordControl;
 export const first = (state: RootState) => state.word.wordFirst;
 export const select = (state: RootState) => state.word.wordSelect;
 export const change = (state: RootState) => state.word.wordChange;
+export const down = (state: RootState) => state.word.isDownloading;
 
 export default wordSlice.reducer;

@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {StyleSheet, View, ToastAndroid} from 'react-native';
 import SearchWord from '../components/SearchWord';
 import {
@@ -12,10 +12,11 @@ import {
 import {useAppDispatch, useAppSelector} from '../redux/hooks';
 import {
   change,
+  down,
   first,
   select,
-  selectWord,
   setChange,
+  setDownloading,
   setFirst,
   setSelect,
 } from '../redux/state/word';
@@ -39,24 +40,26 @@ interface Lang {
 
 const DropDownMenu = () => {
   const checkFirst = useAppSelector(first);
-  const wordContent = useAppSelector(selectWord);
   const wordSelect = useAppSelector(select);
   const wordChange = useAppSelector(change);
+  const isDown = useAppSelector(down);
+
   const dispatch = useAppDispatch();
 
   const netInfo = useNetInfo();
 
   const [source, setSource] = useState<LANG_TAGS_TYPE>(wordSelect.source);
+  const [sourceSpeechLang, setSourceSpeechLang] = useState(
+    wordSelect.sourceSpeechLang,
+  );
   const [target, setTarget] = useState<LANG_TAGS_TYPE>(wordSelect.target);
-  const [downLang, setDownLang] = useState<LANG_TAGS_TYPE>(wordSelect.downLang);
+  const [targetSpeechLang, setTargetSpeechLang] = useState(
+    wordSelect.targetSpeechLang,
+  );
+  const [downLang, setDownLang] = useState<LANG_TAGS_TYPE>(isDown.downLang);
   const [changer, setChanger] = useState(wordChange.change);
 
-  const [soruceSpeechLang, setSourceSpeechLang] = useState(
-    wordContent.sourceSpeechLang,
-  );
-  const [targetSpeechLang, setTargetSpeechLang] = useState(
-    wordContent.targetSpeechLang,
-  );
+  const didMountRef = useRef(false);
 
   const [content, setContent] = useState({
     lang: 'TURKISH' as LANG_TAGS_TYPE,
@@ -65,9 +68,7 @@ const DropDownMenu = () => {
       "Language pack not found!!!\nWould you like to install the language's pack?",
   });
 
-  const [visibleLoading, setVisibleLoading] = useState(
-    wordSelect.isDownloading,
-  );
+  const [visibleLoading, setVisibleLoading] = useState(isDown.isDownloading);
   const [visibleAllowModal, setVisibleAllowModal] = useState(false);
   const hiddenAllowModal = () => setVisibleAllowModal(false);
 
@@ -107,14 +108,26 @@ const DropDownMenu = () => {
         }
       } else {
         if (bool) {
-          dispatch(setSelect({...wordSelect, source: lan.label}));
-          setSource(lan.label);
+          dispatch(
+            setSelect({
+              ...wordSelect,
+              source: lan.label,
+              sourceSpeechLang: lan.speechLang,
+            }),
+          );
           setSourceSpeechLang(lan.speechLang);
+          setSource(lan.label);
           dispatch(setFirst({...checkFirst, source: true}));
         } else {
-          dispatch(setSelect({...wordSelect, target: lan.label}));
-          setTarget(lan.label);
+          dispatch(
+            setSelect({
+              ...wordSelect,
+              target: lan.label,
+              targetSpeechLang: lan.speechLang,
+            }),
+          );
           setTargetSpeechLang(lan.speechLang);
+          setTarget(lan.label);
           dispatch(setFirst({...checkFirst, target: true}));
         }
       }
@@ -123,17 +136,34 @@ const DropDownMenu = () => {
 
   const download = (language: LANG_TAGS_TYPE) => {
     downloadModel(language);
-    dispatch(
-      setSelect({...wordSelect, isDownloading: true, downLang: language}),
-    );
+    dispatch(setDownloading({isDownloading: true, downLang: language}));
     setDownLang(language);
     setVisibleLoading(true);
   };
 
   useEffect(() => {
+    if (didMountRef.current) {
+      dispatch(
+        setSelect({
+          source: target,
+          sourceSpeechLang: targetSpeechLang,
+          target: source,
+          targetSpeechLang: sourceSpeechLang,
+        }),
+      );
+
+      setSource(wordSelect.target);
+      setSourceSpeechLang(wordSelect.targetSpeechLang);
+      setTarget(wordSelect.source);
+      setTargetSpeechLang(wordSelect.sourceSpeechLang);
+    }
+    didMountRef.current = true;
+  }, [changer]);
+
+  useEffect(() => {
     if (netInfo.isConnected === false) {
       setVisibleLoading(false);
-    } else if (wordSelect.isDownloading === true) {
+    } else if (isDown.isDownloading === true) {
       setVisibleLoading(true);
     }
   }, [netInfo.isConnected]);
@@ -141,8 +171,8 @@ const DropDownMenu = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       MLKitTranslator.isModelDownloaded(downLang).then(e => {
-        if (e === true) {
-          dispatch(setSelect({...wordSelect, isDownloading: false}));
+        if (e === true && visibleLoading) {
+          dispatch(setDownloading({...isDown, isDownloading: false}));
           setVisibleLoading(false);
           clearInterval(interval);
         } else {
@@ -155,14 +185,7 @@ const DropDownMenu = () => {
 
   return (
     <>
-      <SearchWord
-        source={!changer ? source : target}
-        target={changer ? source : target}
-        sourceSpeechLang={!changer ? soruceSpeechLang : targetSpeechLang}
-        targetSpeechLang={changer ? soruceSpeechLang : targetSpeechLang}
-        change={changer}
-        first={checkFirst}
-      />
+      <SearchWord />
       <View
         className={'absolute left-0'}
         style={{width: wp('34%'), height: hp('7%'), top: hp('10%')}}>
@@ -175,17 +198,9 @@ const DropDownMenu = () => {
           style={styles.dropdown}
           placeholder="Language"
           onChange={(val: Lang) => {
-            isDownload(val, !changer);
+            isDownload(val, true);
           }}
-          value={
-            !changer
-              ? checkFirst.source
-                ? source
-                : null
-              : checkFirst.target
-              ? target
-              : null
-          }
+          value={checkFirst.source ? wordSelect.source : null}
           data={lang}
           imageField={''}
           labelField={'label'}
@@ -233,17 +248,9 @@ const DropDownMenu = () => {
           style={styles.dropdown}
           placeholder="Language"
           onChange={(val: Lang) => {
-            isDownload(val, changer);
+            isDownload(val, false);
           }}
-          value={
-            changer
-              ? checkFirst.source
-                ? source
-                : null
-              : checkFirst.target
-              ? target
-              : null
-          }
+          value={checkFirst.target ? wordSelect.target : null}
           data={lang}
           labelField="label"
           valueField="value"

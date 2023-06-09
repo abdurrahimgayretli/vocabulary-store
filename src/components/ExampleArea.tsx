@@ -12,7 +12,7 @@ import {
 import {useAppDispatch, useAppSelector} from '../redux/hooks';
 import {
   example,
-  selectWord,
+  wordContent,
   control,
   setControl,
   setExample,
@@ -20,7 +20,7 @@ import {
 import {useNetInfo} from '@react-native-community/netinfo';
 
 const ExampleArea = () => {
-  const wordContent = useAppSelector(selectWord);
+  const wordContents = useAppSelector(wordContent);
   const exampleContent = useAppSelector(example);
   const controlContent = useAppSelector(control);
 
@@ -28,18 +28,18 @@ const ExampleArea = () => {
   const [error, setError] = useState(true);
   const [sentence, setSentence] = useState(exampleContent.sentence);
   const [wordArray, setWordArray] = useState<String[]>(
-    sentence?.toLowerCase().split(wordContent.enWord.toLowerCase()),
+    sentence?.toLowerCase().split(wordContents.enWord.toLowerCase()),
   );
 
   const dispatch = useAppDispatch();
   const netInfo = useNetInfo();
 
   const {isLoading, data, refetch} = useQuery(['sentences'], () => {
-    return wordContent.enWord === 'Vocabulary Store'
+    return wordContents.enWord === 'Vocabulary Store'
       ? 'Welcome to Vocabulary Store'
       : controlContent.control
       ? exampleContent.sentence
-      : exampleSentences(wordContent.enWord).catch(() => {
+      : exampleSentences(wordContents.enWord).catch(() => {
           setError(true);
         });
   });
@@ -51,7 +51,7 @@ const ExampleArea = () => {
           {wordArray[0]}
           {wordArray[1] !== undefined && (
             <Text className="font-bold">
-              {wordContent.enWord.toLowerCase()}
+              {wordContents.enWord.toLowerCase()}
             </Text>
           )}
           {wordArray[1]}
@@ -67,12 +67,12 @@ const ExampleArea = () => {
     } else {
       setError(true);
     }
-  }, [wordContent.enWord, netInfo.isConnected]);
+  }, [wordContents.enWord, netInfo.isConnected]);
 
   useEffect(() => {
     if (data !== undefined && !error) {
       dispatch(setExample({...exampleContent, sentence: data}));
-      setWord(wordContent.enWord);
+      setWord(wordContents.enWord);
     }
   }, [data]);
 
@@ -82,7 +82,7 @@ const ExampleArea = () => {
       setWordArray(
         exampleContent.sentence
           .toLowerCase()
-          .split(wordContent.enWord.toLowerCase()),
+          .split(wordContents.enWord.toLowerCase()),
       );
     }
   }, [exampleContent.sentence]);
@@ -122,7 +122,7 @@ const ExampleArea = () => {
               ? 'Loading...'
               : data === null
               ? 'Sentence Not Found!!!'
-              : netInfo.isConnected === false && word === wordContent.enWord
+              : netInfo.isConnected === false && word === wordContents.enWord
               ? text()
               : netInfo.isConnected === false
               ? 'No Internet Connection!!!'

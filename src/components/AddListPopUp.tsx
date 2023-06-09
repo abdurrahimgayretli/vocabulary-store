@@ -4,7 +4,7 @@ import React, {useCallback, useState} from 'react';
 import {IconButton} from 'react-native-paper';
 import {Lists, useQuery, useRealm} from '../models/Lists';
 import {useAppSelector} from '../redux/hooks';
-import {selectWord} from '../redux/state/word';
+import {wordContent} from '../redux/state/word';
 import {Words} from '../models/Words';
 import {
   widthPercentageToDP as wp,
@@ -17,7 +17,7 @@ const AddListPopUp = () => {
   const lists = useQuery<Lists>('List');
   const realm = useRealm();
 
-  const wordContent = useAppSelector(selectWord);
+  const wordContents = useAppSelector(wordContent);
 
   const handleAddWord = useCallback(
     (
@@ -40,7 +40,6 @@ const AddListPopUp = () => {
     },
     [realm],
   );
-
   return (
     <Box className="absolute">
       <Popover
@@ -77,10 +76,10 @@ const AddListPopUp = () => {
                     onTouchEnd={() => {
                       setIsOpen(false);
                       handleAddWord(
-                        wordContent.word,
-                        wordContent.transWord,
-                        wordContent.sourceSpeechLang,
-                        wordContent.targetSpeechLang,
+                        wordContents.word,
+                        wordContents.transWord,
+                        wordContents.sourceSpeechLang,
+                        wordContents.targetSpeechLang,
                         val.listName,
                       );
                     }}
